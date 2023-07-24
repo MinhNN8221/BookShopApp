@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.shopbook'
+    namespace 'com.example.BookShop'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.shopbook"
+        applicationId "com.example.BookShop"
         minSdk 24
         targetSdk 33
         versionCode 1

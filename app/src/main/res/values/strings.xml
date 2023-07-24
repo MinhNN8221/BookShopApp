@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ShopBook</string>
+    <string name="app_name">BookShop</string>
     <string name="Welcome" />
     <string name="welcome_back_glad_to_see_you_again">Welcome back! Glad to see you, Again!</string>
     <string name="enter_your_email">Enter your email</string>
@@ -43,4 +43,7 @@
     <string name="search_bar">Search</string>
     <string name="wishlist_bar">Wishlist</string>
     <string name="cart_bar">Cart</string>
+    <string name="onboard">Book Store</string>
+    <string name="history_search">Lịch sử tìm kiếm</string>
+    <string name="introduce">Good books, like good friends, are few and chosen; the more select, the more enjoyable</string>
 </resources>

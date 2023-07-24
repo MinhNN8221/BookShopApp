@@ -42,7 +42,6 @@
         app:layout_constraintEnd_toEndOf="@+id/text_auth_right"
         app:layout_constraintStart_toStartOf="@+id/image_left"
         app:layout_constraintTop_toBottomOf="@+id/image_left" />
-
     <SearchView
         android:id="@+id/search_product"
         android:layout_width="0dp"
@@ -50,6 +49,7 @@
         android:layout_marginTop="22dp"
         android:background="@drawable/bg_search"
         android:iconifiedByDefault="false"
+        android:queryBackground="@null"
         android:queryHint="Search"
         app:layout_constraintEnd_toEndOf="@+id/text_auth_right"
         app:layout_constraintStart_toStartOf="@+id/image_left"

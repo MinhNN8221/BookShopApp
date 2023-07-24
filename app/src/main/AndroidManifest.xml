@@ -10,13 +10,15 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ShopBook"
+        android:theme="@style/Theme.BookShop"
         tools:targetApi="31">
         <activity
             android:name=".LoginActivity"
-            android:exported="false" />
+            android:exported="false"/>
+
         <activity
             android:name=".MainActivity"
+            android:windowSoftInputMode="adjustNothing"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
