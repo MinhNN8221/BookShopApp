@@ -1,4 +1,6 @@
 package com.example.BookShop.data.repository.auth
 
-class AuthRepositoryImp : AuthRepository{
+import com.example.BookShop.data.repository.auth.AuthRepository
+
+class AuthRepositoryImp : AuthRepository {
 }

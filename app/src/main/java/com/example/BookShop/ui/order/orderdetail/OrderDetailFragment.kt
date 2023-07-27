@@ -6,13 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.BookShop.R
+import com.example.BookShop.databinding.FragmentOrderDetailBinding
+import com.example.BookShop.ui.adapter.OrderDetailAdapter
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class OrderDetailFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = OrderDetailFragment()
-    }
+    private var binding: FragmentOrderDetailBinding?=null
 
     private lateinit var viewModel: OrderDetailViewModel
 
@@ -20,13 +22,23 @@ class OrderDetailFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_order_detail, container, false)
+        binding= FragmentOrderDetailBinding.inflate(layoutInflater, container, false)
+        return binding?.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(OrderDetailViewModel::class.java)
-        // TODO: Use the ViewModel
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val bottomNavigationView =
+            requireActivity().findViewById<BottomNavigationView>(R.id.navigation)
+        bottomNavigationView.visibility = View.GONE
+        val orderDetailList = viewModel.getOrderDetails()
+        val adapter = OrderDetailAdapter(orderDetailList)
+        binding?.recyclerOrderDetail?.layoutManager = LinearLayoutManager(context)
+        binding?.recyclerOrderDetail?.adapter = adapter
+    }
 }

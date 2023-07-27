@@ -24,18 +24,15 @@ class ChangePassFragment : Fragment() {
         return binding?.root
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(ChangePassViewModel::class.java)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.imageLeft?.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ChangePassViewModel::class.java)
-        // TODO: Use the ViewModel
-
     }
 
 }

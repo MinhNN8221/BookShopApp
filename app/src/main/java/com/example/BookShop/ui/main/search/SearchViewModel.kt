@@ -1,25 +1,32 @@
 package com.example.BookShop.ui.main.search
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.BookShop.data.model.Product
+import com.example.BookShop.data.repository.search.SearchRepository
+import com.example.BookShop.data.repository.search.SearchRepositoryImp
+import com.example.BookShop.datasource.remote.RemoteDataSource
+import kotlinx.coroutines.*
 
-class SearchViewModel : ViewModel(){
-    private val bookList= mutableListOf<Product>()
-    private val historyList= mutableListOf<Product>()
-    init {
-        bookList.add(
-            Product(1, "Đắc nhân tâm", "Descriptisfdson", "1000VND",
-                "200VND", "https://cdn0.fahasa.com/media/catalog/product/h/o/hoi-chung-tuoi-thanh-xuan_9_ban-pho-thong.jpg", "", "", 0, 0, 0))
-        bookList.add(Product(3, "Đắc đạo", "Descriptisfdson", "1000VND",
-            "200VND", "https://cdn0.fahasa.com/media/catalog/product/8/9/8935280913738-dd.jpg", "", "", 0, 0, 0))
-        bookList.add(Product(2, "Đắc văn kỉ tử", "Descriptisfdson", "1000VND",
-            "200VND", "https://cdn0.fahasa.com/media/catalog/product/8/9/8935280913738-dd.jpg", "", "", 0, 0, 0))
-    }
-    fun getProducts():List<Product>{
-        return bookList
-    }
+class SearchViewModel() : ViewModel() {
+    private val _productList = MutableLiveData<List<Product>>()
+    val productList: LiveData<List<Product>> get() = _productList
 
-    fun getHistory():List<Product>{
-        return historyList
+    //    val productList:MutableList<Product> get() = _productList
+    private var searchRepository: SearchRepository? = SearchRepositoryImp(RemoteDataSource())
+    fun getAllProducts() {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val response = searchRepository?.getAllProducts()
+            if (response?.isSuccessful == true) {
+                _productList.postValue(response.body()?.products)
+            } else {
+                Log.d("NNULLL", "NULLLL")
+            }
+        }
     }
 }

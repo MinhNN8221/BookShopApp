@@ -66,7 +66,7 @@
         </androidx.cardview.widget.CardView>
 
         <ImageView
-            android:id="@+id/iamge_favorite"
+            android:id="@+id/image_favorite"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -84,7 +84,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
-        android:layout_marginTop="@dimen/dp_30"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="32dp"
         android:text="Mắt biếc"
         android:textColor="@color/primaryDeep"

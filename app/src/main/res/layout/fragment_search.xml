@@ -42,7 +42,6 @@
     <TextView
         android:id="@+id/text_title_search"
         android:layout_width="0dp"
-        android:visibility="invisible"
         android:layout_height="wrap_content"
         android:text="@string/history_search"
         android:textStyle="bold"
@@ -55,13 +54,22 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_history_search"
-        android:visibility="invisible"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="@id/text_title_search"
         app:layout_constraintStart_toStartOf="@id/text_title_search"
         app:layout_constraintTop_toBottomOf="@id/text_title_search" />
-
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/group_history_search"
+        android:visibility="invisible"
+        app:constraint_referenced_ids="recycler_history_search, text_title_search"/>
+    <androidx.constraintlayout.widget.Group
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/group_search"
+        app:constraint_referenced_ids="constraint_filter, recycler_product"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_filter"
         android:layout_width="0dp"
@@ -136,7 +144,7 @@
         android:layout_height="0dp"
         android:paddingTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/constraint_filter"
+        app:layout_constraintEnd_toEndOf="@id/constraint_filter"
         app:layout_constraintStart_toStartOf="@+id/constraint_filter"
         app:layout_constraintTop_toBottomOf="@+id/constraint_filter" />
 </androidx.constraintlayout.widget.ConstraintLayout>

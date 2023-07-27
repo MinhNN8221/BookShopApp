@@ -44,6 +44,8 @@
     <string name="wishlist_bar">Wishlist</string>
     <string name="cart_bar">Cart</string>
     <string name="onboard">Book Store</string>
+    <string name="category">Category</string>
     <string name="history_search">Lịch sử tìm kiếm</string>
+    <string name="supplier">Tên NCC: </string>
     <string name="introduce">Good books, like good friends, are few and chosen; the more select, the more enjoyable</string>
 </resources>

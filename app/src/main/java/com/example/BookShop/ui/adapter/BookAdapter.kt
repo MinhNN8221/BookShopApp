@@ -6,14 +6,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.BookShop.data.model.Product
 import com.example.BookShop.databinding.ItemProductBinding
+import com.example.BookShop.ui.adapter.OnItemClickListener
 
-class BookAdapter(private val productList: List<Product>) :
+class BookAdapter(private var productList: List<Product>) :
     RecyclerView.Adapter<BookAdapter.ViewHolder>() {
 
+    fun setData(products: List<Product>) {
+        productList = products
+        notifyDataSetChanged()
+    }
     private var onItemClickListener: OnItemClickListener? = null
     fun setOnItemClickListener(listener: OnItemClickListener) {
         onItemClickListener = listener
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemProductBinding.inflate(inflater, parent, false)
@@ -24,7 +30,7 @@ class BookAdapter(private val productList: List<Product>) :
         val product = productList[position]
         holder.bind(product)
     }
-
+    fun getBook(position: Int): Product = productList[position]
     override fun getItemCount(): Int = productList.size
 
     inner class ViewHolder(private val binding: ItemProductBinding) :
@@ -37,7 +43,7 @@ class BookAdapter(private val productList: List<Product>) :
 //                .error(R.drawable.error_image)
                 .into(binding.imageProduct)
             binding.textPrice.text = product.price
-            binding.textDescription.text = product.description
+            binding.textName.text = product.name
             binding.cardview.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
@@ -46,6 +52,4 @@ class BookAdapter(private val productList: List<Product>) :
             }
         }
     }
-
-
 }

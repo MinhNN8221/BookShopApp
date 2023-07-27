@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.BookShop.R
 import com.example.BookShop.ui.adapter.BookAdapter
 import com.example.BookShop.databinding.FragmentAuthorBinding
+import com.example.BookShop.ui.adapter.ItemSpacingDecoration
 import com.example.BookShop.ui.adapter.OnItemClickListener
 import com.example.BookShop.ui.productdetail.ProductdetailFragment
 
@@ -31,16 +32,19 @@ class AuthorFragment : Fragment() {
         return binding?.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this).get(AuthorViewModel::class.java)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(AuthorViewModel::class.java)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         val bookList = viewModel.getProducts()
         val adapter = BookAdapter(bookList)
+        val horizontalSpacing =
+            resources.getDimensionPixelSize(R.dimen.horizontal_spacing)
+        val verticalSpacing =
+            resources.getDimensionPixelSize(R.dimen.vertical_spacing)
         binding?.apply {
             searchProduct.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
@@ -66,6 +70,12 @@ class AuthorFragment : Fragment() {
                     return false;
                 }
             })
+            recyclerAuthor.addItemDecoration(
+                ItemSpacingDecoration(
+                    horizontalSpacing,
+                    verticalSpacing
+                )
+            )
             recyclerAuthor.layoutManager = GridLayoutManager(context, 2)
             recyclerAuthor.adapter = adapter
             imageLeft.setOnClickListener {

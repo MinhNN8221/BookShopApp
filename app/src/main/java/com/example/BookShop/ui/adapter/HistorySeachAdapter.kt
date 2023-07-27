@@ -25,7 +25,7 @@ class HistorySeachAdapter(private val historyList: List<Product>) :
     }
 
     override fun getItemCount(): Int {
-        return historyList.size
+        return 5
     }
 
     inner class ViewHolder(private val binding: ItemHistorySearchBinding) :
