@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -42,10 +43,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // TODO: Use the ViewModel
-//        bookList = viewModel.getProducts()
-        adapter = BookAdapter(bookList)
+        binding?.loadingLayout?.root?.visibility=View.VISIBLE
         viewModel.getAllProducts()
         observeProducts()
         val horizontalSpacing =
@@ -57,13 +55,16 @@ class SearchFragment : Fragment() {
         bottomNavigationView.visibility = View.VISIBLE
         binding?.apply {
             recyclerProduct.layoutManager = GridLayoutManager(context, 2)
-            recyclerProduct.adapter = adapter
             recyclerProduct.addItemDecoration(
                 ItemSpacingDecoration(
                     horizontalSpacing,
                     verticalSpacing
                 )
             )
+            textProductNew.setOnClickListener {
+//                searchNewProduct()
+                Toast.makeText(context, "?????", Toast.LENGTH_SHORT).show()
+            }
             editSearch.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus) {
                     groupHistorySearch.visibility = View.VISIBLE
@@ -105,7 +106,8 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun observeProducts() {
+    private fun searchNewProduct() {
+        viewModel.getSearchNewProduct()
         viewModel.productList.observe(viewLifecycleOwner, Observer { productList ->
             if (productList != null) {
                 adapter = BookAdapter(productList)
@@ -116,15 +118,30 @@ class SearchFragment : Fragment() {
             }
         })
     }
-    private fun navToProductDetail(){
+
+    private fun observeProducts() {
+        viewModel.productList.observe(viewLifecycleOwner, Observer { productList ->
+            if (productList != null) {
+                adapter = BookAdapter(productList)
+                binding?.recyclerProduct?.adapter = adapter
+                binding?.loadingLayout?.root?.visibility=View.INVISIBLE
+                navToProductDetail()
+            } else {
+                Log.d("NULLLL", "HEllo")
+            }
+        })
+    }
+
+    private fun navToProductDetail() {
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
-                val product=adapter.getBook(position)
+                val product = adapter.getBook(position)
                 val bundle = Bundle()
-                Log.d("PRODUCT_ID", product.product_id.toString())
-                bundle.putString("book_id", product.product_id.toString())
+                bundle.putString("bookId", product.product_id.toString())
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, ProductdetailFragment().apply { arguments = bundle })
+                    .replace(
+                        R.id.frame_layout,
+                        ProductdetailFragment().apply { arguments = bundle })
                     .addToBackStack("SearchFragment")
                     .commit()
             }

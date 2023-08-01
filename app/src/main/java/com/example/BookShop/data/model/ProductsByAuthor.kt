@@ -1,9 +1,8 @@
 package com.example.BookShop.data.model
 
-import com.example.BookShop.data.model.Order
 import com.google.gson.annotations.SerializedName
 
-data class OrderList(
+data class ProductsByAuthor(
     @SerializedName("count") var count: Int,
-    @SerializedName("orders") var orders: List<Order>,
+    @SerializedName("rows") var products: List<Product>,
 )

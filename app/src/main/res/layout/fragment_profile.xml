@@ -55,7 +55,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="14dp"
         android:layout_marginTop="53dp"
-        android:text="Nguyễn Tuấn Anh"
         android:textSize="@dimen/dp_24"
         android:textColor="@color/black"
         app:layout_constraintStart_toEndOf="@+id/cardview"
@@ -68,7 +67,6 @@
         android:layout_marginStart="14dp"
         android:layout_marginTop="5dp"
         android:textColor="@color/black"
-        android:text="shawn_howard@gmail.com"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/cardview"
         app:layout_constraintTop_toBottomOf="@+id/text_name" />

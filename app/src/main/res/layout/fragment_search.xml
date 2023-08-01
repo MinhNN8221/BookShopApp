@@ -137,7 +137,10 @@
                 android:src="@drawable/ic_incre" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <include
+        layout="@layout/layout_loading"
+        android:id="@+id/loadingLayout"
+        android:visibility="gone" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_product"
         android:layout_width="0dp"

@@ -15,13 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ProductdetailViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
     private val _productListInfo = MutableLiveData<ProductInfoList?>()
     val productInfo: MutableLiveData<ProductInfoList?> get() = _productListInfo
-//    private val _supplierInfo = MutableLiveData<Supplier?>()
-//    val supplierInfo: MutableLiveData<Supplier?> get() = _supplierInfo
-//    private val _authorInfo = MutableLiveData<Author?>()
-//    val authorInfo: MutableLiveData<Author?> get() = _authorInfo
 
     private var productRepository: ProductRepository? = ProductRepositoryImp(RemoteDataSource())
     fun getProductInfo(id: Int) {
@@ -29,7 +24,6 @@ class ProductdetailViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
 
             val response = productRepository?.getProductInfo(id)
-            Log.d("QUERY1", "getProductInfo: "+response?.body()?.toString())
             if (response?.isSuccessful == true) {
 //                _productInfo.postValue(response.body()?.product)
 //                _supplierInfo.postValue(response.body()?.supplier)

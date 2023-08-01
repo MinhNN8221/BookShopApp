@@ -1,13 +1,20 @@
 package com.example.BookShop.ui.author
 
+import android.graphics.Typeface
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
+import android.util.Log
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.BookShop.R
 import com.example.BookShop.ui.adapter.BookAdapter
@@ -24,6 +31,7 @@ class AuthorFragment : Fragment() {
 
     private lateinit var viewModel: AuthorViewModel
     private var binding: FragmentAuthorBinding? = null
+    private lateinit var adapter: BookAdapter
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -39,8 +47,13 @@ class AuthorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bookList = viewModel.getProducts()
-        val adapter = BookAdapter(bookList)
+        binding?.loadingLayout?.root?.visibility = View.VISIBLE
+        val authorId = arguments?.getString("authorId")?.toInt()
+        authorId?.let {
+            viewModel.getProductsByAuthor(authorId)
+            viewModel.getAuthor(authorId)
+            observeProducts()
+        }
         val horizontalSpacing =
             resources.getDimensionPixelSize(R.dimen.horizontal_spacing)
         val verticalSpacing =
@@ -54,7 +67,11 @@ class AuthorFragment : Fragment() {
 
                 override fun onQueryTextChange(newText: String): Boolean {
                     if (newText.isEmpty()) {
-                        textAuthor.visibility = View.VISIBLE;
+                        textAuthor.visibility = View.VISIBLE
+                        if (authorId != null) {
+                            viewModel.getProductsByAuthor(authorId)
+                        }
+                        observeProducts()
                     } else {
                         val layoutParams =
                             searchProduct.layoutParams as ViewGroup.MarginLayoutParams
@@ -66,6 +83,10 @@ class AuthorFragment : Fragment() {
                         layoutParams.topMargin = newMarginTopInPx
                         searchProduct.layoutParams = layoutParams
                         textAuthor.visibility = View.GONE;
+                        authorId?.let {
+                            viewModel.getSearchAuthorProduct(it, newText)
+                            observeProducts()
+                        }
                     }
                     return false;
                 }
@@ -77,7 +98,7 @@ class AuthorFragment : Fragment() {
                 )
             )
             recyclerAuthor.layoutManager = GridLayoutManager(context, 2)
-            recyclerAuthor.adapter = adapter
+//            recyclerAuthor.adapter = adapter
             imageLeft.setOnClickListener {
                 parentFragmentManager.popBackStack()
             }
@@ -85,14 +106,65 @@ class AuthorFragment : Fragment() {
                 parentFragmentManager.popBackStack()
             }
         }
+
+    }
+
+    private fun observeProducts() {
+        viewModel.productList.observe(viewLifecycleOwner, Observer { productList ->
+            if (productList != null) {
+                adapter = BookAdapter(productList)
+                binding?.recyclerAuthor?.adapter = adapter
+                navToProductDetail()
+                binding?.loadingLayout?.root?.visibility = View.INVISIBLE
+            } else {
+                Log.d("NULLLL", "HEllo")
+            }
+        })
+        viewModel.author.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                if (!it.author.authorDescription.contains(it.author.authorName))
+                    it.author.authorDescription =
+                        it.author.authorName + " " + it.author.authorDescription
+                binding?.textAuthor?.text =
+                    setAuthorName(it.author.authorDescription, it.author.authorName)
+            }
+        })
+        viewModel.productList.observe(viewLifecycleOwner, Observer { productList ->
+            adapter = BookAdapter(productList)
+            binding?.recyclerAuthor?.adapter = adapter
+            navToProductDetail()
+        })
+    }
+
+    private fun navToProductDetail() {
         adapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
                 val productFragment = ProductdetailFragment()
+                val product = adapter.getBook(position)
+                val bundle = Bundle()
+                bundle.putString("bookId", product.product_id.toString())
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, productFragment)
+                    .replace(R.id.frame_layout, productFragment.apply { arguments = bundle })
                     .addToBackStack("AuthorFragment")
                     .commit()
             }
         })
+    }
+
+    private fun setAuthorName(authorDes: String, authorName: String): SpannableString {
+        val content = SpannableString(authorDes)
+        content.setSpan(
+            StyleSpan(Typeface.BOLD),
+            0,
+            authorName.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        content.setSpan(
+            RelativeSizeSpan(1.25f),
+            0,
+            authorName.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return content
     }
 }
