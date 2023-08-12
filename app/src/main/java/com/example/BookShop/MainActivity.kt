@@ -2,22 +2,24 @@ package com.example.BookShop
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.BookShop.databinding.ActivityMainBinding
 import com.example.BookShop.ui.auth.signin.SignInFragment
 import com.example.BookShop.ui.onboarding.OnboardingFragment
+import com.example.BookShop.utils.MySharedPreferences
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var bnd: ActivityMainBinding
-    private lateinit var pref: SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bnd = ActivityMainBinding.inflate(layoutInflater)
-        val view: View = bnd.getRoot()
+        val view: View = bnd.root
         setContentView(view)
-        pref = getSharedPreferences("myPreference", MODE_PRIVATE)
+        MySharedPreferences.init(this)
+        Log.d("FIRST", isFirstLaunch().toString())
         val support = supportFragmentManager.beginTransaction()
         if (isFirstLaunch()) {
             val fragmentOnboard = OnboardingFragment()
@@ -30,14 +32,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isFirstLaunch(): Boolean {
-        return pref.getBoolean("first_launch", true)
+        return MySharedPreferences.getBoolean("firstLaunch", true)
     }
 
     private fun setFirstLaunch(isFirstTime: Boolean) {
-        var editor: SharedPreferences.Editor = pref.edit()
-        editor.putBoolean("first_launch", isFirstTime)
-        editor.apply()
+        MySharedPreferences.putBoolean("firstLaunch", isFirstTime)
     }
-
-
 }

@@ -17,7 +17,6 @@ class ChangePassViewModel : ViewModel() {
     fun changePassword(email:String, old_password:String, new_password:String){
         viewModelScope.launch(Dispatchers.IO){
             val response=userRepository?.changePassword(email, old_password, new_password)
-            Log.d("RESPONSE", response?.body().toString())
             if(response?.isSuccessful==true){
                 message.postValue("UPDATE PASSWORD SUCCESSFUL")
             }else{

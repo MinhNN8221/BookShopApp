@@ -10,19 +10,23 @@ class SearchRepositoryImp(private val dataSource: IDataSource) : SearchRepositor
     override suspend fun getSearchProducts(
         limit: Int,
         page: Int,
-        description_length: Int,
-        query_string: String,
-        filter_type: Int,
-        price_sort_order: String,
+        descriptionLength: Int,
+        queryString: String,
+        filterType: Int,
+        priceSortOrder: String,
     ): Response<ProductList>? {
         return dataSource.getSearchProducts(
             limit,
             page,
-            description_length,
-            query_string,
-            filter_type,
-            price_sort_order,
+            descriptionLength,
+            queryString,
+            filterType,
+            priceSortOrder,
         )
+    }
+
+    override suspend fun getSearchHistory(queryString: String): Response<ProductList> {
+        return dataSource.getSearchHistory(queryString)
     }
 
     override suspend fun getSearchAuthorProducts(
@@ -38,6 +42,22 @@ class SearchRepositoryImp(private val dataSource: IDataSource) : SearchRepositor
             page,
             descriptionLength,
             queryString,
+        )
+    }
+
+    override suspend fun getSearchCategoryProducts(
+        limit: Int,
+        page: Int,
+        descriptionLength: Int,
+        queryString: String,
+        categroryId: Int,
+    ): Response<ProductList>? {
+        return dataSource.getSearchCategoryProducts(
+            limit,
+            page,
+            descriptionLength,
+            queryString,
+            categroryId,
         )
     }
 

@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.BookShop.R
@@ -15,6 +16,7 @@ import com.example.BookShop.ui.order.orderhistory.OrderHistoryFragment
 import com.example.BookShop.ui.profile.changepass.ChangePassFragment
 import com.example.BookShop.ui.profile.profilesignin.ProfileSigninFragment
 import com.example.BookShop.ui.profile.updateprofile.UpdateProfileFragment
+import com.example.BookShop.utils.MySharedPreferences
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProfileFragment : Fragment() {
@@ -36,21 +38,23 @@ class ProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
+        viewModel = ViewModelProvider(this, ProfileViewModelFactory(requireActivity().application))[ProfileViewModel::class.java]
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding?.layoutLoading?.root?.visibility = View.VISIBLE
         val bottomNavigationView =
             requireActivity().findViewById<BottomNavigationView>(R.id.navigation)
         bottomNavigationView.visibility = View.GONE
-        viewModel.getCustomer()
-        var email=""
+        var email = ""
+        activity?.let { MySharedPreferences.init(it.applicationContext) }
 //        var passw
         viewModel.profile.observe(viewLifecycleOwner, Observer {
             bindData(it)
-            email= it.email.toString()
+            email = it.email.toString()
         })
+        viewModel.getCustomer()
         binding?.apply {
             imageLeft.setOnClickListener {
                 parentFragmentManager.popBackStack()
@@ -62,19 +66,24 @@ class ProfileFragment : Fragment() {
                     .addToBackStack("profile")
                     .commit()
             }
+            textClear.setOnClickListener {
+                MySharedPreferences.clearDataCache()
+                viewModel.clearDatabase()
+                Toast.makeText(context, "CLEAR SUCCESSFUL", Toast.LENGTH_SHORT).show()
+            }
             textLogout.setOnClickListener {
-                val fragmentSignin = ProfileSigninFragment()
+                MySharedPreferences.clearPreferences()
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, fragmentSignin)
+                    .replace(R.id.frame_layout, ProfileSigninFragment())
                     .addToBackStack("profile")
                     .commit()
             }
             textChange.setOnClickListener {
                 val fragmentChangePass = ChangePassFragment()
-                val bundle=Bundle()
+                val bundle = Bundle()
                 bundle.putString("email", email)
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, fragmentChangePass.apply { arguments=bundle })
+                    .replace(R.id.frame_layout, fragmentChangePass.apply { arguments = bundle })
                     .addToBackStack("profile")
                     .commit()
             }
@@ -88,13 +97,24 @@ class ProfileFragment : Fragment() {
     }
 
     private fun bindData(profile: Customer) {
-        binding?.apply {
-            Glide.with(root)
-                .load(profile.avatar)
-                .centerCrop()
-                .into(imageAvatar)
-            textName.text = profile.name
-            textMail.text = profile.email
+        val imgAvatar = MySharedPreferences.getString("imageAvatar", "")
+        if (imgAvatar != "") {
+            binding?.apply {
+                Glide.with(root)
+                    .load(imgAvatar)
+                    .centerCrop()
+                    .into(imageAvatar)
+            }
+        } else {
+            binding?.apply {
+                Glide.with(root)
+                    .load(profile.avatar)
+                    .centerCrop()
+                    .into(imageAvatar)
+            }
         }
+        binding?.textName?.text = profile.name
+        binding?.textMail?.text = profile.email
+        binding?.layoutLoading?.root?.visibility = View.INVISIBLE
     }
 }

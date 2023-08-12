@@ -5,7 +5,10 @@
     android:background="@color/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <include
+        layout="@layout/layout_loading"
+        android:id="@+id/layoutLoading"
+        android:visibility="gone"/>
     <ImageView
         android:id="@+id/image_left"
         android:layout_width="@dimen/dp_34"

@@ -13,9 +13,10 @@ import kotlinx.coroutines.launch
 
 class OrderDetailViewModel : ViewModel() {
     // TODO: Implement the ViewModel
+
     private val _orderDetailList = MutableLiveData<OrderDetail>()
-    val orderDetailList: MutableLiveData<OrderDetail> get() = _orderDetailList
-    private var orderRepository: OrderRepositoryImp =OrderRepositoryImp(RemoteDataSource())
+    val orderDetailList:MutableLiveData<OrderDetail> get() = _orderDetailList
+    private var orderRepository:OrderRepositoryImp=OrderRepositoryImp(RemoteDataSource())
 
     fun getOrderDetails(orderId:Int) {
         viewModelScope.launch(Dispatchers.IO){

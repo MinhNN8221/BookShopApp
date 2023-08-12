@@ -8,8 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.BookShop.data.model.Author
 import com.example.BookShop.data.model.AuthorResult
 import com.example.BookShop.data.model.Product
+import com.example.BookShop.data.model.ProductState
 import com.example.BookShop.data.repository.author.AuthorRepository
 import com.example.BookShop.data.repository.author.AuthorRepositoryImp
+import com.example.BookShop.data.repository.cart.CartRepository
+import com.example.BookShop.data.repository.cart.CartRepositoryImp
 import com.example.BookShop.data.repository.product.ProductRepository
 import com.example.BookShop.data.repository.product.ProductRepositoryImp
 import com.example.BookShop.data.repository.search.SearchRepository
@@ -20,34 +23,40 @@ import kotlinx.coroutines.launch
 
 class AuthorViewModel : ViewModel() {
     // TODO: Implement the ViewModel
-    private val _productList = MutableLiveData<List<Product>>()
-    val productList: LiveData<List<Product>> get() = _productList
+    private val _productList = MutableLiveData<ProductState>()
+    val productList: LiveData<ProductState> get() = _productList
     private val _author = MutableLiveData<AuthorResult>()
     val author: LiveData<AuthorResult> get() = _author
 
     private var productRepository: ProductRepository? = ProductRepositoryImp(RemoteDataSource())
     private var authorRepository: AuthorRepository? = AuthorRepositoryImp(RemoteDataSource())
     private var searchRepository: SearchRepository? = SearchRepositoryImp(RemoteDataSource())
-    fun getProductsByAuthor(author_id: Int) {
-
+    private var cartRepository: CartRepository? = CartRepositoryImp(RemoteDataSource())
+    fun getProductsByAuthor(authorId: Int, limit: Int, page: Int, desLength: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = productRepository?.getProductsByAuthor(author_id, 20, 100)
+            val response = productRepository?.getProductsByAuthor(authorId, limit, page, desLength)
             if (response?.isSuccessful == true) {
-                _productList.postValue(response.body()?.products)
+                _productList.postValue(ProductState(response.body()?.products, true))
             } else {
                 Log.d("NNULLL", "NULLLL")
             }
         }
     }
 
-    fun getSearchAuthorProduct(authorId: Int, queryString: String) {
+    fun getSearchAuthorProduct(authorId: Int, currentPage: Int, queryString: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val response =
-                searchRepository?.getSearchAuthorProducts(authorId, 10, 1, 100, queryString)
+                searchRepository?.getSearchAuthorProducts(
+                    authorId,
+                    10,
+                    currentPage,
+                    100,
+                    queryString
+                )
             if (response?.isSuccessful == true) {
-                _productList.postValue(response.body()?.products)
+                _productList.postValue(ProductState(response.body()?.products, false))
             } else {
-                Log.d("NNULLL", "NULLLL")
+                Log.d("searchAuthor", "NULLLL")
             }
         }
     }
@@ -59,6 +68,18 @@ class AuthorViewModel : ViewModel() {
                 _author.postValue(response.body())
             } else {
                 Log.d("AUTHORNULL", "NULL")
+            }
+        }
+    }
+
+    fun addItemToCart(productId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = cartRepository?.addCartItem(productId)
+            Log.d("FAILL", response?.body().toString())
+            if (response?.isSuccessful == true) {
+                Log.d("SUCCESSFUL", "OK")
+            } else {
+                Log.d("NULL", "NULL")
             }
         }
     }

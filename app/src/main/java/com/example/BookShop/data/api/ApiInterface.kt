@@ -1,19 +1,41 @@
 package com.example.BookShop.data.api
 
 import com.example.BookShop.data.model.*
+import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiInterface {
+    @FormUrlEncoded
+    @POST("customers/login")
+    suspend fun login(
+        @Field("email") email: String,
+        @Field("password") password: String,
+    ): Response<LoginResponse>
+
+    @GET("products")
+    suspend fun getProducts(): Response<ProductList>
+
+    @GET("category")
+    suspend fun getCategory(): Response<CategoryList>
+
+    @GET("author/hot")
+    suspend fun getAuthor(): Response<AuthorList>
+
     @GET("products/search")
     suspend fun getSearchProducts(
         @Query("limit") limit: Int,
         @Query("page") page: Int,
-        @Query("description_length") description_length: Int,
-        @Query("query_string") query_string: String,
-        @Query("filter_type") filter_type: Int,
-        @Query("price_sort_order") price_sort_order: String,
+        @Query("description_length") descriptionLength: Int,
+        @Query("query_string") queryString: String,
+        @Query("filter_type") filterType: Int,
+        @Query("price_sort_order") priceSortOrder: String,
+    ): Response<ProductList>
+
+    @GET("products/search")
+    suspend fun getSearchHistory(
+        @Query("query_string") queryString: String,
     ): Response<ProductList>
 
     @GET("products/author/search")
@@ -25,7 +47,15 @@ interface ApiInterface {
         @Query("query_string") queryString: String,
     ): Response<ProductList>
 
-    @Headers("user-key: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcl9pZCI6MiwibmFtZSI6IlR1YW4gQW5oIiwiZW1haWwiOiJhbmhkdDFAeW9wbWFpbC5jb20iLCJpYXQiOjE2ODk4NDM5NTMsImV4cCI6MTY5MTEzOTk1M30.Hg_DXIPz_uDjBbX8d5khpFWdu0or6Xxd8Ij-k_pOcuA")
+    @GET("products/category/search")
+    suspend fun getSearchCategoryProducts(
+        @Query("limit") limit: Int,
+        @Query("page") page: Int,
+        @Query("description_length") descriptionLength: Int,
+        @Query("query_string") queryString: String,
+        @Query("category_id") categoryId: Int,
+    ): Response<ProductList>
+
     @GET("products/{product_id}")
     suspend fun getProductInfo(@Path("product_id") product_id: Int): Response<ProductInfoList>
 
@@ -33,8 +63,17 @@ interface ApiInterface {
     suspend fun getProductsByAuthor(
         @Query("author_id") author_id: Int,
         @Query("limit") limit: Int,
+        @Query("page") page: Int,
         @Query("description_length") description_length: Int,
     ): Response<ProductsByAuthor>
+
+    @GET("products/incategory/{categoryId}")
+    suspend fun getProductsByCategory(
+        @Path("categoryId") categoryId: Int,
+        @Query("limit") limit: Int,
+        @Query("page") page: Int,
+        @Query("description_length") description_length: Int,
+    ): Response<ProductList>
 
     @GET("author/{authorId}")
     suspend fun getAuthor(@Path("authorId") authorId: Int): Response<AuthorResult>
@@ -42,12 +81,10 @@ interface ApiInterface {
     @GET("products/new")
     suspend fun getSearchNewProduct(): Response<ProductNewList>
 
-    @Headers("user-key: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcl9pZCI6MiwibmFtZSI6IlR1YW4gQW5oIiwiZW1haWwiOiJhbmhkdDFAeW9wbWFpbC5jb20iLCJpYXQiOjE2ODk4NDM5NTMsImV4cCI6MTY5MTEzOTk1M30.Hg_DXIPz_uDjBbX8d5khpFWdu0or6Xxd8Ij-k_pOcuA")
     @GET("customers")
     suspend fun getCustomer(): Response<Customer>
 
     @FormUrlEncoded
-    @Headers("user-key: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcl9pZCI6MiwibmFtZSI6IlR1YW4gQW5oIiwiZW1haWwiOiJhbmhkdDFAeW9wbWFpbC5jb20iLCJpYXQiOjE2ODk4NDM5NTMsImV4cCI6MTY5MTEzOTk1M30.Hg_DXIPz_uDjBbX8d5khpFWdu0or6Xxd8Ij-k_pOcuA")
     @PUT("customers")
     suspend fun updateCustomer(
         @Field("name") name: String,
@@ -65,11 +102,31 @@ interface ApiInterface {
         @Field("new_password") new_password: String,
     ): Response<Customer>
 
-    @Headers("user-key: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcl9pZCI6MiwibmFtZSI6IlR1YW4gQW5oIiwiZW1haWwiOiJhbmhkdDFAeW9wbWFpbC5jb20iLCJpYXQiOjE2ODk4NDM5NTMsImV4cCI6MTY5MTEzOTk1M30.Hg_DXIPz_uDjBbX8d5khpFWdu0or6Xxd8Ij-k_pOcuA")
+    @Multipart
+
+    @POST("customers/update/avatar")
+    suspend fun changeAvatar(
+        @Part image: MultipartBody.Part,
+    ): Response<Customer>
+
+
     @GET("orders")
     suspend fun getOrderHistory(): Response<OrderList>
 
-    @Headers("user-key: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcl9pZCI6MiwibmFtZSI6IlR1YW4gQW5oIiwiZW1haWwiOiJhbmhkdDFAeW9wbWFpbC5jb20iLCJpYXQiOjE2ODk4NDM5NTMsImV4cCI6MTY5MTEzOTk1M30.Hg_DXIPz_uDjBbX8d5khpFWdu0or6Xxd8Ij-k_pOcuA")
+
     @GET("orders/{orderId}")
     suspend fun getOrderDetail(@Path("orderId") orderId: Int): Response<OrderDetail>
+
+    @FormUrlEncoded
+
+    @POST("shoppingCart/add")
+    suspend fun addProduct2Cart(@Field("product_id") productId: Int): Response<List<CartItem>>
+
+    @FormUrlEncoded
+    @POST("wishlist/add")
+    suspend fun addItemToWishList(@Field("product_id") productId: Int): Response<Messeage>
+
+
+    @DELETE("wishlist/remove/{product_id}")
+    suspend fun removeItemInWishList(@Path("product_id") productId: Int): Response<Messeage>
 }

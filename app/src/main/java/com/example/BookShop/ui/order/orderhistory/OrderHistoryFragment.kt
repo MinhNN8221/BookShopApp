@@ -21,6 +21,7 @@ import com.example.BookShop.utils.FormatDate
 import java.time.LocalDateTime
 
 class OrderHistoryFragment : Fragment() {
+
     companion object {
         fun newInstance() = OrderHistoryFragment()
     }
@@ -45,8 +46,8 @@ class OrderHistoryFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.loadingLayout?.root?.visibility=View.VISIBLE
-        viewModel.getOrderHistory()
+        adapter = OrderHistoryAdapter()
+        binding?.loadingLayout?.root?.visibility = View.VISIBLE
         val list = mutableListOf<OrderHistory>()
         val currentDate = formatDate.formatDate(LocalDateTime.now().toString())
         val mapOrder: MutableMap<String, MutableList<Order>> = mutableMapOf()
@@ -54,7 +55,7 @@ class OrderHistoryFragment : Fragment() {
             if (it != null) {
                 mapOrder.clear()
                 for (order in it) {
-                    var date = formatDate.formatDate(order.createdOn)
+                    val date = formatDate.formatDate(order.createdOn)
                     if (date == currentDate) {
                         mapOrder.computeIfAbsent("Hôm nay") { mutableListOf() }.add(order)
                     } else {
@@ -68,13 +69,14 @@ class OrderHistoryFragment : Fragment() {
                         list.add(OrderHistory(null, values))
                     }
                 }
-                adapter = OrderHistoryAdapter(list)
-                binding?.recyclerOrderHistory?.layoutManager = LinearLayoutManager(context)
-                binding?.recyclerOrderHistory?.adapter = adapter
+                adapter.setData(list)
                 navToOrderDetail()
-                binding?.loadingLayout?.root?.visibility=View.INVISIBLE
+                binding?.loadingLayout?.root?.visibility = View.INVISIBLE
             }
         })
+        viewModel.getOrderHistory()
+        binding?.recyclerOrderHistory?.layoutManager = LinearLayoutManager(context)
+        binding?.recyclerOrderHistory?.adapter = adapter
         binding?.apply {
             imageLeftOrder.setOnClickListener {
                 parentFragmentManager.popBackStack()

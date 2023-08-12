@@ -1,19 +1,42 @@
 package com.example.BookShop.ui.profile.updateprofile
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.DatePickerDialog
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.BookShop.R
 import com.example.BookShop.data.model.Customer
 import com.example.BookShop.databinding.FragmentUpdateProfileBinding
 import com.example.BookShop.ui.profile.permission.PermissionFragment
+import com.example.BookShop.utils.FormatDate
+import com.example.BookShop.utils.MySharedPreferences
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 class UpdateProfileFragment : Fragment() {
+
     companion object {
         fun newInstance() = UpdateProfileFragment()
     }
@@ -37,18 +60,23 @@ class UpdateProfileFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(UpdateProfileViewModel::class.java)
     }
 
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.layoutLoading?.root?.visibility=View.VISIBLE
+        binding?.layoutLoading?.root?.visibility = View.VISIBLE
+        initViewModel()
         viewModel.getCustomer()
-        observeProfile()
+        activity?.let { MySharedPreferences.init(it.applicationContext) }
         binding?.apply {
             cardview.setOnClickListener {
-                val fragmentPermission = PermissionFragment()
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, fragmentPermission)
-                    .addToBackStack("updateProfile")
-                    .commit()
+                if (context?.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(arrayOf(Manifest.permission.READ_MEDIA_IMAGES), 1)
+                } else {
+                    openImageDirectory()
+//                    binding?.layoutLoading?.root?.visibility = View.VISIBLE
+                }
+
             }
             imageLeft.setOnClickListener {
                 parentFragmentManager.popBackStack()
@@ -59,10 +87,44 @@ class UpdateProfileFragment : Fragment() {
             textUpdateProfile.setOnClickListener {
                 updateProfie()
             }
+            val myCalendar = Calendar.getInstance()
+            var year = myCalendar.get(Calendar.YEAR)
+            var month = myCalendar.get(Calendar.MONTH)
+            var dayOfMonth = myCalendar.get(Calendar.DAY_OF_MONTH)
+            editDob.setOnClickListener {
+                Log.d("DATE1", editDob.text.toString())
+                if (editDob.text.toString() != "") {
+                    val date = editDob.text.toString().split("/")
+                    Log.d("DATE", date.toString())
+                    year = date[2].toInt()
+                    month = date[1].toInt() - 1
+                    dayOfMonth = date[0].toInt()
+                }
+                DatePickerDialog(
+                    requireContext(),
+                    { datePicker, year, month, dayOfMonth ->
+                        val dateOfBirth = "$dayOfMonth/${month + 1}/$year"
+                        editDob.setText(FormatDate().formatDateOfBirth(dateOfBirth))
+                    }, year, month, dayOfMonth
+                ).show()
+            }
+            layoutProfile.setOnTouchListener { view, motionEvent ->
+                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    val event =
+                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    event.hideSoftInputFromWindow(requireView().windowToken, 0)
+                }
+                false
+            }
         }
     }
 
-    private fun observeProfile() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun initViewModel() {
+        viewModel.message.observe(viewLifecycleOwner, Observer {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT)
+                .show()
+        })
         viewModel.profile.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 bindData(it)
@@ -73,14 +135,67 @@ class UpdateProfileFragment : Fragment() {
         })
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray,
+    ) {
+        if (requestCode == 1) {
+            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openImageDirectory()
+            } else {
+                Toast.makeText(context, "User ko cap quyen", Toast.LENGTH_SHORT).show()
+            }
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun openImageDirectory() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*" // Loại tệp tin là ảnh
+        }
+        startActivityForResult(intent, 1)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            val uri = data?.data
+            val picturePath = uri?.let { uriToFilePath(it) }
+            val file = File(picturePath)
+            val requestBody = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), file)
+            val multiPart = MultipartBody.Part.createFormData("image", file.name, requestBody)
+            viewModel.changeAvatar(multiPart)
+            MySharedPreferences.putString("imageAvatar", picturePath.toString())
+            binding?.imageAvatar?.setImageURI(uri)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun bindData(profile: Customer) {
+        val imgAvatar = MySharedPreferences.getString("imageAvatar", "")
+        if (imgAvatar != "") {
+            binding?.apply {
+                Glide.with(root)
+                    .load(imgAvatar)
+                    .centerCrop()
+                    .into(imageAvatar)
+            }
+        } else {
+            binding?.apply {
+                Glide.with(root)
+                    .load(profile.avatar)
+                    .centerCrop()
+                    .into(imageAvatar)
+            }
+        }
         binding?.apply {
-            Glide.with(root)
-                .load(profile.avatar)
-                .centerCrop()
-                .into(imageAvatar)
             editFullname.setText(profile.name)
-            editDob.setText(profile.date_of_birth)
+            if (profile.date_of_birth != null) {
+                editDob.setText(FormatDate().formatDateOfBirthView(profile.date_of_birth.toString()))
+            } else {
+                editDob.setText(profile.date_of_birth)
+            }
             editPhone.setText(profile.mob_phone)
             editAddress.setText(profile.address)
             editEmail.setText(profile.email)
@@ -89,21 +204,55 @@ class UpdateProfileFragment : Fragment() {
             } else {
                 radiobtnNu.isChecked = true
             }
-            binding?.layoutLoading?.root?.visibility=View.INVISIBLE
+            layoutLoading.root.visibility = View.INVISIBLE
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updateProfie() {
+        val pattern = Regex("^0\\d{9}$")
         binding?.apply {
             val fullName = editFullname.text.toString()
-            val Dob = editDob.text.toString()
+            val Dob = FormatDate().formatDateReverse(editDob.text.toString())
             var gender = "Nữ"
             if (radiobtnNam.isChecked) {
                 gender = "Nam"
             }
             val phone = editPhone.text.toString()
             val address = editAddress.text.toString()
-            viewModel.updateCustomer(fullName, address, Dob, gender, phone)
+            val checkPhone = pattern.matches(editPhone.text.toString())
+            if (checkPhone) {
+                viewModel.updateCustomer(fullName, address, Dob, gender, phone)
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Please enter the correct format of the phone number!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
+    }
+
+    private fun uriToFilePath(uri: Uri): String? {
+        val inputStream = context?.contentResolver?.openInputStream(uri)
+        inputStream?.use { inputStream ->
+            val outputFile = createTempImageFile()
+            val outputStream = FileOutputStream(outputFile)
+            outputStream.use { outputStream ->
+                val buffer = ByteArray(4 * 1024) //4KB
+                var bytesRead: Int
+                while (inputStream.read(buffer).also { bytesRead = it } >= 0) {
+                    outputStream.write(buffer, 0, bytesRead)
+                }
+                return outputFile.absolutePath
+            }
+        }
+        return null
+    }
+
+    private fun createTempImageFile(): File {
+        val tempFileName = "temp_image_${System.currentTimeMillis()}.jpg"
+        val storageDir = context?.getExternalFilesDir(null)
+        return File.createTempFile(tempFileName, ".jpg", storageDir)
     }
 }

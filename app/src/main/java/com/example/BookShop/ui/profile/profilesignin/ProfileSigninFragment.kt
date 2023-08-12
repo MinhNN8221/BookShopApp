@@ -10,15 +10,11 @@ import android.view.ViewGroup
 import com.example.BookShop.R
 import com.example.BookShop.databinding.FragmentProfileSigninBinding
 import com.example.BookShop.ui.auth.signin.SignInFragment
+import com.example.BookShop.ui.auth.signup.SignUpFragment
 
 class ProfileSigninFragment : Fragment() {
 
-    private lateinit var viewModel: ProfileSigninViewModel
     private var binding:FragmentProfileSigninBinding?=null
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ProfileSigninViewModel::class.java)
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -33,6 +29,11 @@ class ProfileSigninFragment : Fragment() {
             textBtnSignin.setOnClickListener{
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, SignInFragment())
+                    .commit()
+            }
+            textCreate.setOnClickListener {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, SignUpFragment())
                     .commit()
             }
         }

@@ -9,11 +9,15 @@ interface SearchRepository {
     suspend fun getSearchProducts(
         limit: Int,
         page: Int,
-        description_length: Int,
-        query_string: String,
-        filter_type: Int,
-        price_sort_order: String,
+        descriptionLength: Int,
+        queryString: String,
+        filterType: Int,
+        priceSortOrder: String,
     ): Response<ProductList>?
+
+    suspend fun getSearchHistory(
+        queryString: String,
+    ): Response<ProductList>
 
     suspend fun getSearchAuthorProducts(
         authorId: Int,
@@ -21,6 +25,13 @@ interface SearchRepository {
         page: Int,
         descriptionLength: Int,
         queryString: String,
+    ): Response<ProductList>?
+
+    suspend fun getSearchCategoryProducts(
+        limit: Int,
+        page: Int,
+        descriptionLength: Int,
+        queryString: String, categroryId: Int,
     ): Response<ProductList>?
 
     suspend fun getSearchNewProduct(): Response<ProductNewList>?

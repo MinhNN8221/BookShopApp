@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
@@ -21,13 +22,18 @@ import com.example.BookShop.databinding.FragmentProductDetailBinding
 import com.example.BookShop.ui.author.AuthorFragment
 import com.example.BookShop.ui.productdetail.ProductdetailViewModel
 import com.example.BookShop.ui.profile.ProfileFragment
+import com.example.BookShop.ui.publisher.PublisherFragment
 import com.example.BookShop.utils.FormatMoney
+import com.example.BookShop.utils.MySharedPreferences
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProductdetailFragment : Fragment() {
     private var binding: FragmentProductDetailBinding? = null
     private lateinit var viewModel: ProductdetailViewModel
-    private val formatMoney= FormatMoney()
+    private var wishlist: Int = 0
+    private val formatMoney = FormatMoney()
+    private var authorId = 0
+    private var publisherId = 0
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -38,7 +44,7 @@ class ProductdetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[ProductdetailViewModel::class.java]
+        viewModel = ViewModelProvider(this).get(ProductdetailViewModel::class.java)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,24 +52,15 @@ class ProductdetailFragment : Fragment() {
         val bottomNavigationView =
             requireActivity().findViewById<BottomNavigationView>(R.id.navigation)
         bottomNavigationView.visibility = View.GONE
-        binding?.loadingLayout?.root?.visibility=View.VISIBLE
+        initViewModel()
+        binding?.loadingLayout?.root?.visibility = View.VISIBLE
         val productId = arguments?.getString("bookId")?.toInt()
-        var authorId=0
         productId?.let {
             viewModel.getProductInfo(it)
-            viewModel.productInfo.observe(viewLifecycleOwner, Observer { productInfoList ->
-                if (productInfoList != null) {
-                    bindData(productInfoList)
-                    authorId=productInfoList.author.authorId
-                } else {
-                    Log.d("NULLLL", "HEllo")
-                }
-            })
         }
 
-
         readmoreInfo()
-
+        activity?.let { MySharedPreferences.init(it.applicationContext) }
         binding?.apply {
             imageLeft.setOnClickListener {
                 parentFragmentManager.popBackStack()
@@ -77,13 +74,71 @@ class ProductdetailFragment : Fragment() {
             }
             textNameAuthor.setOnClickListener {
                 val authorFragment = AuthorFragment()
-                val bundle=Bundle()
+                val bundle = Bundle()
                 bundle.putString("authorId", authorId.toString())
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, authorFragment.apply { arguments=bundle })
+                    .replace(R.id.frame_layout, authorFragment.apply { arguments = bundle })
                     .addToBackStack("productFragment")
                     .commit()
             }
+            textAdditemtocart.setOnClickListener {
+                productId?.let { productId ->
+                    viewModel.addItemToCart(productId)
+                    Toast.makeText(context, "ADD ITEM TO CART SUCCESSFUL", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            imageFavorite.setOnClickListener {
+                productId?.let { productId -> itemWishList(productId) }
+            }
+            imageArrow.setOnClickListener {
+                val bundle = Bundle()
+                bundle.putString("publisherId", publisherId.toString())
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.frame_layout, PublisherFragment().apply { arguments = bundle })
+                    .addToBackStack("ProductDetail")
+                    .commit()
+            }
+        }
+    }
+
+    private fun initViewModel() {
+        viewModel.productInfo.observe(viewLifecycleOwner) { productInfoList ->
+            if (productInfoList != null) {
+                bindData(productInfoList)
+                authorId = productInfoList.author.authorId
+                wishlist = productInfoList.product.wishlist
+                publisherId = productInfoList.supplier.supplier_id
+            } else {
+                Log.d("NULLLL", "HEllo")
+            }
+        }
+
+        viewModel.messeageAdd.observe(viewLifecycleOwner) {
+//            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+        }
+
+        viewModel.messeageRemove.observe(viewLifecycleOwner, Observer {
+//            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
+        })
+    }
+
+    private fun itemWishList(productId: Int) {
+        MySharedPreferences.putInt("productId", productId)
+        if (wishlist == 0) {
+            viewModel.addItemToWishList(productId)
+            wishlist = 1
+            Toast.makeText(context, "Đã thêm vào wishlist của bạn!", Toast.LENGTH_SHORT).show()
+            MySharedPreferences.putInt("wishlist", 1)
+            binding?.imageFavorite?.setImageResource(R.drawable.ic_favorite)
+            binding?.imageFavorite?.setBackgroundResource(R.drawable.bg_ellipse_favor)
+        } else {
+            viewModel.removeItemInWishList(productId)
+            wishlist = 0
+            Toast.makeText(context, "Đã xóa khỏi wishlist của bạn!", Toast.LENGTH_SHORT).show()
+            MySharedPreferences.putInt("wishlist", 0)
+            binding?.imageFavorite?.setImageResource(R.drawable.favor_white)
+            binding?.imageFavorite?.setBackgroundResource(R.drawable.bg_ellipse)
         }
     }
 
@@ -95,23 +150,41 @@ class ProductdetailFragment : Fragment() {
                 .centerCrop()
                 .into(imagePro)
             textName.text = productInfoList.product.name
-            textNum.text=resources.getString(R.string.quantity)
-            textMa.text=resources.getString(R.string.productId)+" "+productInfoList.product.productId
+            textNum.text = resources.getString(R.string.quantity)
+            textMa.text =
+                resources.getString(R.string.productId) + " " + productInfoList.product.productId
             textDescription.text = productInfoList.product.description
-            textPrice.text = formatMoney.formatMoney(productInfoList.product.price.toDouble().toLong())
-            textAuthor.text=resources.getString(R.string.author)+": "
-            textNameAuthor.text= setAuthorName(productInfoList.author.authorName)
-            textNcc.text=resources.getString(R.string.supplier)+": "+productInfoList.supplier.supplier_name
-            textYear.text=resources.getString(R.string.year)
-            textLanguage.text=resources.getString(R.string.language)
-            readmore.text=resources.getString(R.string.readmore)
-            textPublish.text=productInfoList.supplier.supplier_name
-            textPriceName.text=resources.getString(R.string.price)
-            if(productInfoList.product.wishlist==1){
-                imageFavorite.setBackgroundResource(R.drawable.bg_ellipse_favor)
-                imageFavorite.setImageResource(R.drawable.ic_favorite)
+            textPrice.text =
+                formatMoney.formatMoney(productInfoList.product.price.toDouble().toLong())
+            textAuthor.text = resources.getString(R.string.author) + ": "
+            textNameAuthor.text = setAuthorName(productInfoList.author.authorName)
+            textNcc.text =
+                resources.getString(R.string.supplier) + ": " + productInfoList.supplier.supplier_name
+            textYear.text = resources.getString(R.string.year)
+            textLanguage.text = resources.getString(R.string.language)
+            readmore.text = resources.getString(R.string.readmore)
+            textPublish.text = productInfoList.supplier.supplier_name
+            textPriceName.text = resources.getString(R.string.price)
+            val wishListPre = MySharedPreferences.getInt("wishlist", -1)
+            val productIdPre = MySharedPreferences.getInt("productId", -1)
+            if (wishListPre != -1 && productIdPre == productInfoList.product.productId) {
+                if (MySharedPreferences.getInt("wishlist", -1) == 1) {
+                    imageFavorite.setBackgroundResource(R.drawable.bg_ellipse_favor)
+                    imageFavorite.setImageResource(R.drawable.ic_favorite)
+                } else {
+                    binding?.imageFavorite?.setImageResource(R.drawable.favor_white)
+                    binding?.imageFavorite?.setBackgroundResource(R.drawable.bg_ellipse)
+                }
+            } else {
+                if (productInfoList.product.wishlist == 1) {
+                    imageFavorite.setBackgroundResource(R.drawable.bg_ellipse_favor)
+                    imageFavorite.setImageResource(R.drawable.ic_favorite)
+                } else {
+                    binding?.imageFavorite?.setImageResource(R.drawable.favor_white)
+                    binding?.imageFavorite?.setBackgroundResource(R.drawable.bg_ellipse)
+                }
             }
-            binding?.loadingLayout?.root?.visibility=View.INVISIBLE
+            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
         }
     }
 

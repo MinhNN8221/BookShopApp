@@ -1,4 +1,4 @@
-package com.example.BookShop.ui.main.wishlist.viewmodel
+package com.example.BookShop.ui.main.wishlist
 
 import androidx.lifecycle.ViewModel
 

@@ -1,4 +1,4 @@
-package com.example.BookShop.ui.adapter
+package com.example.BookShop.utils
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

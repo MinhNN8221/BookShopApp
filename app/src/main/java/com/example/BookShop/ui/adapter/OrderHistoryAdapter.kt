@@ -11,11 +11,11 @@ import com.example.BookShop.databinding.ItemHeaderOrderHistoryBinding
 import com.example.BookShop.databinding.ItemOrderHistoryBinding
 import com.example.BookShop.utils.FormatMoney
 
-class OrderHistoryAdapter(private var orderHistoryList: List<OrderHistory>) :
+class OrderHistoryAdapter :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    //    private val HEADER_VIEW_TYPE = 0
-//    private val ITEM_VIEW_TYPE = 1
+    private var orderHistoryList: MutableList<OrderHistory> = mutableListOf()
     private val formatMoney = FormatMoney()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return if (viewType == 0) {
@@ -25,6 +25,13 @@ class OrderHistoryAdapter(private var orderHistoryList: List<OrderHistory>) :
             val binding = ItemOrderHistoryBinding.inflate(inflater, parent, false)
             ItemViewHolder(binding)
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setData(orderHistories: List<OrderHistory>) {
+        orderHistoryList.clear()
+        orderHistoryList.addAll(orderHistories)
+        notifyDataSetChanged()
     }
 
     private var onItemClickListener: OnItemClickListener? = null
@@ -37,7 +44,6 @@ class OrderHistoryAdapter(private var orderHistoryList: List<OrderHistory>) :
     }
 
     override fun getItemViewType(position: Int): Int {
-//        Log.d("VIEWTYPE HEADER",orderHistoryList[position].header.toString() )
         return if (orderHistoryList[position].header != null) 0 else 1
     }
 
@@ -46,7 +52,6 @@ class OrderHistoryAdapter(private var orderHistoryList: List<OrderHistory>) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-//        Log.d("POSITION", position.toString())
         val header = orderHistoryList[position].header
         val itemOrder = orderHistoryList[position].order
         when (holder) {
@@ -66,7 +71,7 @@ class OrderHistoryAdapter(private var orderHistoryList: List<OrderHistory>) :
         RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
         fun bind(item: Order) {
-            binding.textIdOrder.text = "#Order"+item.orderId.toString()
+            binding.textIdOrder.text = "#Order" + item.orderId.toString()
             binding.textNumberPro.text = item.totalQuantity + " sản phẩm"
             binding.textPrice.text = item.orderTotal?.toDouble()
                 ?.let { formatMoney.formatMoney(it.toLong()) }
@@ -79,5 +84,4 @@ class OrderHistoryAdapter(private var orderHistoryList: List<OrderHistory>) :
             }
         }
     }
-
 }

@@ -15,6 +15,7 @@
 
     <!--color-->
     <color name="secondary">#EEF1F4</color>
+    <color name="darkgray">#6A707C</color>
     <color name="primary">#667080</color>
     <color name="bg_cam">#434343</color>
     <color name="colorsearch">#262525</color>

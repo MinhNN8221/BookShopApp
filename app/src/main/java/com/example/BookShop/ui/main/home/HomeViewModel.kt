@@ -1,4 +1,4 @@
-package com.example.BookShop.ui.main.home.viewmodel
+package com.example.BookShop.ui.main.home
 
 import androidx.lifecycle.ViewModel
 
