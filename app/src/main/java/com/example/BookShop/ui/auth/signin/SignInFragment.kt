@@ -1,5 +1,7 @@
 package com.example.BookShop.ui.auth.signin
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
@@ -7,8 +9,10 @@ import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.example.BookShop.R
 import com.example.BookShop.data.api.RetrofitClient
@@ -38,6 +42,7 @@ class SignInFragment : Fragment() {
         return binding?.root
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
@@ -47,6 +52,14 @@ class SignInFragment : Fragment() {
             RetrofitClient.updateAccessToken(accessToken)
         }
         binding?.apply {
+            layoutSignIn.setOnTouchListener { view, motionEvent ->
+                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    val event =
+                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    event.hideSoftInputFromWindow(requireView().windowToken, 0)
+                }
+                false
+            }
             buttonLogin.setOnClickListener {
                 val username = editUsername.text.toString()
                 val password = editPassword.text.toString()

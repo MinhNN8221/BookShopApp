@@ -60,4 +60,5 @@
     <string name="productId">Mã hàng:</string>
     <string name="readmore">Read more.</string>
     <string name="price">Price</string>
+    <string name="deleteHistory">Xóa lịch sử tìm kiếm</string>
 </resources>

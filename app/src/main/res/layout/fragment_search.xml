@@ -60,12 +60,24 @@
         app:layout_constraintEnd_toEndOf="@id/text_title_search"
         app:layout_constraintStart_toStartOf="@id/text_title_search"
         app:layout_constraintTop_toBottomOf="@id/text_title_search" />
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_removeAll"
+        android:text="@string/deleteHistory"
+        android:gravity="center"
+        android:textStyle="italic"
+        android:textSize="15dp"
+        android:textColor="@color/primary"
+        app:layout_constraintTop_toBottomOf="@id/recycler_history_search"
+        app:layout_constraintStart_toStartOf="@id/recycler_history_search"
+        app:layout_constraintEnd_toEndOf="@id/recycler_history_search"/>
     <androidx.constraintlayout.widget.Group
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/group_history_search"
         android:visibility="invisible"
-        app:constraint_referenced_ids="recycler_history_search, text_title_search"/>
+        app:constraint_referenced_ids="recycler_history_search, text_title_search, text_removeAll"/>
     <androidx.constraintlayout.widget.Group
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

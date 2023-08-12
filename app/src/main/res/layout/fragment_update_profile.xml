@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/layoutProfile"
+    android:id="@+id/layout_profile"
     android:background="@color/background">
 
     <TextView
         android:id="@+id/text_profile"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/dp_30"
+        android:layout_marginTop="26dp"
         android:layout_marginEnd="@dimen/dp_24"
         android:gravity="top"
         android:text="@string/updateprofile"
@@ -104,6 +104,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="-4dp"
                 android:textColor="@color/black"
+                android:maxLines="1"
+                android:inputType="text"
+                android:ellipsize="end"
                 android:textSize="20dp"
                 app:layout_constraintEnd_toEndOf="@+id/text_fullname"
                 app:layout_constraintStart_toStartOf="@+id/text_fullname"
@@ -168,6 +171,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="20dp"
+                android:focusable="false"
                 app:layout_constraintEnd_toEndOf="@+id/edit_fullname"
                 app:layout_constraintStart_toStartOf="@+id/edit_fullname"
                 app:layout_constraintTop_toBottomOf="@+id/text_dob" />
@@ -213,6 +217,9 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="20dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:inputType="textEmailAddress"
                 app:layout_constraintEnd_toEndOf="@+id/edit_phone"
                 app:layout_constraintStart_toStartOf="@+id/edit_fullname"
                 app:layout_constraintTop_toBottomOf="@+id/text_address" />
@@ -233,7 +240,7 @@
                 android:id="@+id/edit_email"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:focusable="false"
+                android:enabled="false"
                 android:inputType="textEmailAddress"
                 android:textColor="@color/black"
                 android:textSize="20dp"

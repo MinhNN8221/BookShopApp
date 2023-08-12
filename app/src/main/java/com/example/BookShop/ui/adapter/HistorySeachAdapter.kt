@@ -1,9 +1,16 @@
 package com.example.BookShop.ui.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.example.BookShop.R
 import com.example.BookShop.data.model.HistorySearch
 import com.example.BookShop.data.model.Product
 import com.example.BookShop.databinding.ItemHistorySearchBinding
@@ -13,6 +20,7 @@ class HistorySeachAdapter :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var historyList: MutableList<HistorySearch> = mutableListOf()
     private var onItemClickListener: OnItemClickListener? = null
+    private var clickRemoveItem: OnItemClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemHistorySearchBinding.inflate(inflater, parent, false)
@@ -24,8 +32,8 @@ class HistorySeachAdapter :
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun clearData() {
-        historyList.clear()
+    fun removeData(position: Int) {
+        historyList.removeAt(position)
         notifyDataSetChanged()
     }
 
@@ -38,6 +46,16 @@ class HistorySeachAdapter :
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         onItemClickListener = listener
+    }
+
+    fun clickRemoveItem(listener: OnItemClickListener) {
+        clickRemoveItem = listener
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun clearData() {
+        historyList.clear()
+        notifyDataSetChanged()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -69,10 +87,15 @@ class HistorySeachAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(productName: String) {
             binding.textItemHistroy.text = productName
+            val position = adapterPosition
             binding.textItemHistroy.setOnClickListener {
-                val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     onItemClickListener?.onItemClick(position)
+                }
+            }
+            binding.imageRemove.setOnClickListener {
+                if (position != RecyclerView.NO_POSITION) {
+                    clickRemoveItem?.onItemClick(position)
                 }
             }
         }

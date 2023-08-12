@@ -104,23 +104,13 @@ class ProductdetailFragment : Fragment() {
 
     private fun initViewModel() {
         viewModel.productInfo.observe(viewLifecycleOwner) { productInfoList ->
-            if (productInfoList != null) {
-                bindData(productInfoList)
-                authorId = productInfoList.author.authorId
-                wishlist = productInfoList.product.wishlist
-                publisherId = productInfoList.supplier.supplier_id
-            } else {
-                Log.d("NULLLL", "HEllo")
+            productInfoList?.let {
+                bindData(it)
+                authorId = it.author.authorId
+                wishlist = it.product.wishlist
+                publisherId = it.supplier.supplier_id
             }
         }
-
-        viewModel.messeageAdd.observe(viewLifecycleOwner) {
-//            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-        }
-
-        viewModel.messeageRemove.observe(viewLifecycleOwner, Observer {
-//            Toast.makeText(context, it.message, Toast.LENGTH_SHORT).show()
-        })
     }
 
     private fun itemWishList(productId: Int) {

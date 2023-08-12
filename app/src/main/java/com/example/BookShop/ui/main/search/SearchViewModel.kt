@@ -73,7 +73,7 @@ class SearchViewModel(application: Application) : ViewModel() {
     }
 
     var job: Job? = null
-    fun getAllHistorySearch(idCustomer: Int) {
+    fun getHistorySearchLocal(idCustomer: Int) {
         job?.cancel()
         job = viewModelScope.launch(Dispatchers.IO) {
             val response = historySearchRepository.getAllProducts(idCustomer)
@@ -81,9 +81,21 @@ class SearchViewModel(application: Application) : ViewModel() {
         }
     }
 
-    fun insertHistorySearch(product: ProductDb) {
+    fun insertHistorySearchLocal(product: ProductDb) {
         viewModelScope.launch(Dispatchers.IO) {
             historySearchRepository.insertProduct(product)
+        }
+    }
+
+    fun deleteHistorySearchLocal() {
+        viewModelScope.launch(Dispatchers.IO) {
+            historySearchRepository.deleteAllProducts()
+        }
+    }
+
+    fun removeItemHistorySearchLocal(productName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            historySearchRepository.deleteColName(productName)
         }
     }
 

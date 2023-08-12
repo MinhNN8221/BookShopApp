@@ -31,6 +31,7 @@ import com.example.BookShop.ui.productdetail.ProductdetailFragment
 import com.example.BookShop.utils.ItemSpacingDecoration
 import com.example.BookShop.utils.MySharedPreferences
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlin.math.min
 
 class SearchFragment : Fragment() {
     private var binding: FragmentSearchBinding? = null
@@ -97,7 +98,8 @@ class SearchFragment : Fragment() {
                 if (hasFocus) {
                     groupHistorySearch.visibility = View.VISIBLE
                     groupSearch.visibility = View.INVISIBLE
-                    viewModel.getAllHistorySearch(idCustomer)
+                    viewModel.getHistorySearchLocal(idCustomer)
+                    textRemoveAll.visibility = View.INVISIBLE
                 } else {
                 }
             }
@@ -119,7 +121,7 @@ class SearchFragment : Fragment() {
                     val layoutParams = textTitleSearch.layoutParams
                     val newText = editSearch.text.toString()
                     if (newText.isEmpty()) {
-                        viewModel.getAllHistorySearch(idCustomer)
+                        viewModel.getHistorySearchLocal(idCustomer)
                         textTitleSearch.visibility = View.VISIBLE
                         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                         textTitleSearch.layoutParams = layoutParams
@@ -134,7 +136,7 @@ class SearchFragment : Fragment() {
             imageSeach.setOnClickListener {
                 val query = editSearch.text.toString()
                 if (!query.isEmpty()) {
-                    viewModel.insertHistorySearch(
+                    viewModel.insertHistorySearchLocal(
                         ProductDb(
                             idCustomer = idCustomer,
                             productName = query
@@ -150,6 +152,12 @@ class SearchFragment : Fragment() {
                 editSearch.clearFocus()
                 groupHistorySearch.visibility = View.INVISIBLE
                 groupSearch.visibility = View.VISIBLE
+            }
+            textRemoveAll.setOnClickListener {
+                viewModel.deleteHistorySearchLocal()
+                list.clear()
+                adapterHistory.clearData()
+                textRemoveAll.visibility=View.INVISIBLE
             }
             textProductNew.setOnClickListener {
                 adapter.clearData()
@@ -266,8 +274,12 @@ class SearchFragment : Fragment() {
             for (historyLocal in it.reversed()) {
                 list.add(HistorySearch(historyLocal, null))
             }
+            if (list.size > 0) {
+                binding?.textRemoveAll?.visibility = View.VISIBLE
+            }
             adapterHistory.setData(list)
             searchLocalProduct()
+            clickRemoveHistory()
         }
         viewModel.productNameList.observe(viewLifecycleOwner) {
             list.clear()
@@ -275,6 +287,7 @@ class SearchFragment : Fragment() {
                 list.add(HistorySearch(null, product))
             }
             adapterHistory.setData(list)
+            binding?.textRemoveAll?.visibility = View.INVISIBLE
             searchSuggestProduct()
         }
     }
@@ -310,7 +323,7 @@ class SearchFragment : Fragment() {
         adapterHistory.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(position: Int) {
                 val product = adapterHistory.getBook(position)
-                viewModel.insertHistorySearch(
+                viewModel.insertHistorySearchLocal(
                     ProductDb(
                         idCustomer = idCustomer,
                         productName = product?.name.toString()
@@ -345,6 +358,21 @@ class SearchFragment : Fragment() {
                     editSearch.clearFocus()
                     groupHistorySearch.visibility = View.INVISIBLE
                     groupSearch.visibility = View.VISIBLE
+                }
+            }
+        })
+    }
+
+    private fun clickRemoveHistory() {
+        adapterHistory.clickRemoveItem(object : OnItemClickListener {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onItemClick(position: Int) {
+                val productName = adapterHistory.getProductNameLocal(position)
+                productName?.let { viewModel.removeItemHistorySearchLocal(it) }
+                list.removeAt(position)
+                adapterHistory.removeData(position)
+                if (list.size == 0) {
+                    binding?.textRemoveAll?.visibility = View.INVISIBLE
                 }
             }
         })
