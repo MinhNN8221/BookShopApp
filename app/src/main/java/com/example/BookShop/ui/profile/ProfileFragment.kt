@@ -79,7 +79,7 @@ class ProfileFragment : Fragment() {
                 val bundle = Bundle()
                 bundle.putString("email", email)
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.cardview, fragmentChangePass.apply { arguments = bundle })
+                    .replace(R.id.container, fragmentChangePass.apply { arguments = bundle })
                     .addToBackStack("profile")
                     .commit()
             }

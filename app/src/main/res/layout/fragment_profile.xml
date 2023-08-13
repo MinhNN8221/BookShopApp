@@ -46,7 +46,7 @@
             android:id="@+id/image_avatar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop" />
     </androidx.cardview.widget.CardView>
 
 
@@ -77,8 +77,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:padding="10dp"
-        android:layout_marginEnd="10dp"
+        android:padding="15dp"
+        android:layout_marginEnd="18dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_profile"
         android:src="@drawable/ic_right" />
@@ -104,7 +104,7 @@
         app:cardBackgroundColor="@color/white"
         app:layout_constraintStart_toStartOf="@+id/cardview"
         app:layout_constraintTop_toBottomOf="@+id/text_order"
-        app:layout_constraintEnd_toEndOf="@+id/image_update">
+        app:layout_constraintEnd_toEndOf="@+id/text_profile">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
