@@ -28,4 +28,6 @@
     <color name="colorPublish">#0E1514</color>
     <color name="colorProduct">#101010</color>
     <color name="line">#B4B4B4</color>
+    <color name="dark">#1E232C</color>
+    <color name="colorLogin">#35C2C1</color>
 </resources>

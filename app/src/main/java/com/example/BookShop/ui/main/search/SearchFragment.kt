@@ -90,9 +90,6 @@ class SearchFragment : Fragment() {
         }
         val horizontalSpacing = resources.getDimensionPixelSize(R.dimen.horizontal_spacing)
         val verticalSpacing = resources.getDimensionPixelSize(R.dimen.vertical_spacing)
-        val bottomNavigationView =
-            requireActivity().findViewById<BottomNavigationView>(R.id.navigation)
-        bottomNavigationView.visibility = View.VISIBLE
         binding?.apply {
             editSearch.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus) {
@@ -311,7 +308,7 @@ class SearchFragment : Fragment() {
                 val product = adapter.getBook(position)
                 val bundle = Bundle()
                 bundle.putString("bookId", product.product_id.toString())
-                parentFragmentManager.beginTransaction().replace(R.id.frame_layout,
+                parentFragmentManager.beginTransaction().replace(R.id.container,
                     ProductdetailFragment().apply { arguments = bundle })
                     .addToBackStack("SearchFragment").commit()
                 pastPage = currentPage
@@ -331,7 +328,7 @@ class SearchFragment : Fragment() {
                 )
                 val bundle = Bundle()
                 bundle.putString("bookId", product?.product_id.toString())
-                parentFragmentManager.beginTransaction().replace(R.id.frame_layout,
+                parentFragmentManager.beginTransaction().replace(R.id.container,
                     ProductdetailFragment().apply { arguments = bundle })
                     .addToBackStack("SearchFragment").commit()
             }

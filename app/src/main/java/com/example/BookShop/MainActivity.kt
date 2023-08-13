@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
         val view: View = bnd.root
         setContentView(view)
         MySharedPreferences.init(this)
-        Log.d("FIRST", isFirstLaunch().toString())
         val support = supportFragmentManager.beginTransaction()
         if (isFirstLaunch()) {
             val fragmentOnboard = OnboardingFragment()

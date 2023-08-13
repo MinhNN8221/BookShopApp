@@ -44,12 +44,8 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.layoutLoading?.root?.visibility = View.VISIBLE
-        val bottomNavigationView =
-            requireActivity().findViewById<BottomNavigationView>(R.id.navigation)
-        bottomNavigationView.visibility = View.GONE
         var email = ""
         activity?.let { MySharedPreferences.init(it.applicationContext) }
-//        var passw
         viewModel.profile.observe(viewLifecycleOwner, Observer {
             bindData(it)
             email = it.email.toString()
@@ -62,7 +58,7 @@ class ProfileFragment : Fragment() {
             imageUpdate.setOnClickListener {
                 val fragmentUpdate = UpdateProfileFragment()
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, fragmentUpdate)
+                    .replace(R.id.container, fragmentUpdate)
                     .addToBackStack("profile")
                     .commit()
             }
@@ -74,7 +70,7 @@ class ProfileFragment : Fragment() {
             textLogout.setOnClickListener {
                 MySharedPreferences.clearPreferences()
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, ProfileSigninFragment())
+                    .replace(R.id.container, ProfileSigninFragment())
                     .addToBackStack("profile")
                     .commit()
             }
@@ -83,13 +79,13 @@ class ProfileFragment : Fragment() {
                 val bundle = Bundle()
                 bundle.putString("email", email)
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, fragmentChangePass.apply { arguments = bundle })
+                    .replace(R.id.cardview, fragmentChangePass.apply { arguments = bundle })
                     .addToBackStack("profile")
                     .commit()
             }
             linearMyOrder.setOnClickListener {
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, OrderHistoryFragment())
+                    .replace(R.id.container, OrderHistoryFragment())
                     .addToBackStack("profile")
                     .commit()
             }

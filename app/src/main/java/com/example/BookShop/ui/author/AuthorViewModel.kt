@@ -75,7 +75,6 @@ class AuthorViewModel : ViewModel() {
     fun addItemToCart(productId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val response = cartRepository?.addCartItem(productId)
-            Log.d("FAILL", response?.body().toString())
             if (response?.isSuccessful == true) {
                 Log.d("SUCCESSFUL", "OK")
             } else {

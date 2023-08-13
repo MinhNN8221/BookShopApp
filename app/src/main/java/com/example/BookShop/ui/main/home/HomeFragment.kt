@@ -25,19 +25,16 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bottomNavigationView =
-            requireActivity().findViewById<BottomNavigationView>(R.id.navigation)
-        bottomNavigationView.visibility = View.VISIBLE
         binding?.apply {
             imageProfile.setOnClickListener {
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, ProfileFragment())
+                    .replace(R.id.container, ProfileFragment())
                     .addToBackStack("HomeFragment")
                     .commit()
             }
             imageNavCategory.setOnClickListener {
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, CategoryIndexFragment())
+                    .replace(R.id.container, CategoryIndexFragment())
                     .addToBackStack("HomeFragment")
                     .commit()
             }

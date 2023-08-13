@@ -49,9 +49,6 @@ class ProductdetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bottomNavigationView =
-            requireActivity().findViewById<BottomNavigationView>(R.id.navigation)
-        bottomNavigationView.visibility = View.GONE
         initViewModel()
         binding?.loadingLayout?.root?.visibility = View.VISIBLE
         val productId = arguments?.getString("bookId")?.toInt()
@@ -68,7 +65,7 @@ class ProductdetailFragment : Fragment() {
             imageAccount.setOnClickListener {
                 val profileFragment = ProfileFragment()
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, profileFragment)
+                    .replace(R.id.container, profileFragment)
                     .addToBackStack("productFragment")
                     .commit()
             }
@@ -77,7 +74,7 @@ class ProductdetailFragment : Fragment() {
                 val bundle = Bundle()
                 bundle.putString("authorId", authorId.toString())
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, authorFragment.apply { arguments = bundle })
+                    .replace(R.id.container, authorFragment.apply { arguments = bundle })
                     .addToBackStack("productFragment")
                     .commit()
             }
@@ -95,7 +92,7 @@ class ProductdetailFragment : Fragment() {
                 val bundle = Bundle()
                 bundle.putString("publisherId", publisherId.toString())
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, PublisherFragment().apply { arguments = bundle })
+                    .replace(R.id.container, PublisherFragment().apply { arguments = bundle })
                     .addToBackStack("ProductDetail")
                     .commit()
             }

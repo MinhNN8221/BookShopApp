@@ -44,9 +44,6 @@ class CategoryIndexFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bottomNavigationView =
-            requireActivity().findViewById<BottomNavigationView>(R.id.navigation)
-        bottomNavigationView.visibility = View.GONE
         adapter = CategoryIndexAdapter()
         val layoutManager = GridLayoutManager(context, 2)
         viewModel.categoryList.observe(viewLifecycleOwner, Observer {
@@ -70,9 +67,11 @@ class CategoryIndexFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 val bundle = Bundle()
                 val categoryId = adapter.getCategory(position).categoryId
+                val categoryName=adapter.getCategory(position).name
                 bundle.putString("categoryId", categoryId.toString())
+                bundle.putString("categoryName", categoryName)
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, CategoryBookFragment().apply { arguments = bundle })
+                    .replace(R.id.container, CategoryBookFragment().apply { arguments = bundle })
                     .addToBackStack("CategoryIndex")
                     .commit()
             }

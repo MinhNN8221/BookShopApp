@@ -29,7 +29,7 @@ class SignUpFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(SignUpViewModel::class.java)
         // TODO: Use the ViewModel
-        binding?.imgback?.setOnClickListener {
+        binding?.imageLeft?.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
     }

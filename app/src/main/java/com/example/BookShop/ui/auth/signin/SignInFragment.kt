@@ -92,7 +92,6 @@ class SignInFragment : Fragment() {
 
     fun initViewModel() {
         viewModel.loginResponse.observe(viewLifecycleOwner) {
-            Log.d("HELLO", it.toString())
             if (it.checkLogin) {
                 navigateToMainScreen()
                 it.loginResponse?.let { loginResponse ->
