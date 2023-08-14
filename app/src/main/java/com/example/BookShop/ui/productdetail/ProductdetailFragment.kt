@@ -7,25 +7,21 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.BookShop.R
 import com.example.BookShop.data.model.ProductInfoList
 import com.example.BookShop.databinding.FragmentProductDetailBinding
 import com.example.BookShop.ui.author.AuthorFragment
-import com.example.BookShop.ui.productdetail.ProductdetailViewModel
 import com.example.BookShop.ui.profile.ProfileFragment
 import com.example.BookShop.ui.publisher.PublisherFragment
 import com.example.BookShop.utils.FormatMoney
 import com.example.BookShop.utils.MySharedPreferences
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProductdetailFragment : Fragment() {
     private var binding: FragmentProductDetailBinding? = null
@@ -124,7 +120,7 @@ class ProductdetailFragment : Fragment() {
             wishlist = 0
             Toast.makeText(context, "Đã xóa khỏi wishlist của bạn!", Toast.LENGTH_SHORT).show()
             MySharedPreferences.putInt("wishlist", 0)
-            binding?.imageFavorite?.setImageResource(R.drawable.favor_white)
+            binding?.imageFavorite?.setImageResource(R.drawable.ic_favor_white)
             binding?.imageFavorite?.setBackgroundResource(R.drawable.bg_ellipse)
         }
     }
@@ -159,7 +155,7 @@ class ProductdetailFragment : Fragment() {
                     imageFavorite.setBackgroundResource(R.drawable.bg_ellipse_favor)
                     imageFavorite.setImageResource(R.drawable.ic_favorite)
                 } else {
-                    binding?.imageFavorite?.setImageResource(R.drawable.favor_white)
+                    binding?.imageFavorite?.setImageResource(R.drawable.ic_favor_white)
                     binding?.imageFavorite?.setBackgroundResource(R.drawable.bg_ellipse)
                 }
             } else {
@@ -167,7 +163,7 @@ class ProductdetailFragment : Fragment() {
                     imageFavorite.setBackgroundResource(R.drawable.bg_ellipse_favor)
                     imageFavorite.setImageResource(R.drawable.ic_favorite)
                 } else {
-                    binding?.imageFavorite?.setImageResource(R.drawable.favor_white)
+                    binding?.imageFavorite?.setImageResource(R.drawable.ic_favor_white)
                     binding?.imageFavorite?.setBackgroundResource(R.drawable.bg_ellipse)
                 }
             }

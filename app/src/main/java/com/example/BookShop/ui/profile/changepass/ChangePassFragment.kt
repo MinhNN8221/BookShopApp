@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import com.example.BookShop.R
 import com.example.BookShop.databinding.FragmentChangePassBinding
 
 class ChangePassFragment : Fragment() {
@@ -66,9 +67,11 @@ class ChangePassFragment : Fragment() {
                     editCurrentPass.transformationMethod =
                         HideReturnsTransformationMethod.getInstance()
                     checkVisible = true
+                    imageEyeCurrentPass.setImageResource(R.drawable.ic_hide_eye)
                 } else {
                     editCurrentPass.transformationMethod = PasswordTransformationMethod.getInstance()
                     checkVisible = false
+                    imageEyeCurrentPass.setImageResource(R.drawable.ic_visible_eye)
                 }
                 if (cursorPosition >= 0) {
                     editCurrentPass.setSelection(cursorPosition)
@@ -80,9 +83,11 @@ class ChangePassFragment : Fragment() {
                     editNewPass.transformationMethod =
                         HideReturnsTransformationMethod.getInstance()
                     checkVisibleNewPass = true
+                    imageEyeNewPass.setImageResource(R.drawable.ic_hide_eye)
                 } else {
                     editCurrentPass.transformationMethod = PasswordTransformationMethod.getInstance()
                     checkVisibleNewPass = false
+                    imageEyeNewPass.setImageResource(R.drawable.ic_visible_eye)
                 }
                 if (cursorPosition >= 0) {
                     editNewPass.setSelection(cursorPosition)
@@ -94,9 +99,11 @@ class ChangePassFragment : Fragment() {
                     editConfirm.transformationMethod =
                         HideReturnsTransformationMethod.getInstance()
                     checkVisibleConfirmPass = true
+                    imageEyeConfirmPass.setImageResource(R.drawable.ic_hide_eye)
                 } else {
                     editConfirm.transformationMethod = PasswordTransformationMethod.getInstance()
                     checkVisibleConfirmPass = false
+                    imageEyeConfirmPass.setImageResource(R.drawable.ic_visible_eye)
                 }
                 if (cursorPosition >= 0) {
                     editConfirm.setSelection(cursorPosition)

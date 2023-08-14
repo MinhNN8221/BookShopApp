@@ -129,4 +129,14 @@ interface ApiInterface {
 
     @DELETE("wishlist/remove/{product_id}")
     suspend fun removeItemInWishList(@Path("product_id") productId: Int): Response<Messeage>
+
+    @GET("wishlist")
+    suspend fun getWishList(
+        @Query("limit") limit: Int,
+        @Query("page") page: Int,
+        @Query("description_length") description_length: Int,
+    ): Response<WishlistResponse>?
+
+    @GET("shoppingCart")
+    suspend fun getAllCart(): Response<Cart>?
 }

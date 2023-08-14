@@ -18,6 +18,8 @@
     <string name="new_community"><![CDATA[New & Community]]></string>
 
     <string name="profile">Profile</string>
+    <string name="favorite">Yêu thích</string>
+    <string name="cart">Giỏ hàng</string>
     <string name="signin">SIGN IN</string>
     <string name="changepassword">Change password</string>
     <string name="updateprofile">Update Profile</string>

@@ -5,13 +5,13 @@ data class Wishlist(
     @SerializedName("product_id")
     val product_id: Int,
     @SerializedName("name")
-    val name: String,
+    val name: String?,
     @SerializedName("description")
-    val description: String,
+    val description: String?,
     @SerializedName("price")
-    val price: String,
-    @SerializedName("discount")
-    val discount: String,
+    val price: String?,
+    @SerializedName("discounted_price")
+    val discount: String?,
     @SerializedName("thumbnail")
-    val thumbnail: String,
+    val thumbnail: String?,
 )

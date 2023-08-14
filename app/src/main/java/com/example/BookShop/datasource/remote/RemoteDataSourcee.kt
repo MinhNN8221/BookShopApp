@@ -11,6 +11,7 @@ class RemoteDataSource() : IDataSource {
     override suspend fun login(email: String, password: String): Response<LoginResponse>? {
         return RetrofitClient.apiService.login(email, password)
     }
+
     override suspend fun getSearchProducts(
         limit: Int,
         page: Int,
@@ -108,6 +109,7 @@ class RemoteDataSource() : IDataSource {
     ): Response<Customer>? {
         return RetrofitClient.apiService.updateCustomer(name, address, dob, gender, mob_phone)
     }
+
     override suspend fun changePassword(
         email: String,
         old_password: String,
@@ -127,6 +129,7 @@ class RemoteDataSource() : IDataSource {
     override suspend fun getOrderDetail(orderId: Int): Response<OrderDetail>? {
         return RetrofitClient.apiService.getOrderDetail(orderId)
     }
+
     override suspend fun getAllAuthor(): Response<AuthorList>? {
         return RetrofitClient.apiService.getAuthor()
     }
@@ -134,6 +137,7 @@ class RemoteDataSource() : IDataSource {
     override suspend fun addCartItem(productId: Int): Response<List<CartItem>>? {
         return RetrofitClient.apiService.addProduct2Cart(productId)
     }
+
     override suspend fun addItemToWishList(productId: Int): Response<Messeage>? {
         return RetrofitClient.apiService.addItemToWishList(productId)
     }
@@ -142,6 +146,17 @@ class RemoteDataSource() : IDataSource {
         return RetrofitClient.apiService.removeItemInWishList(productId)
     }
 
+    override suspend fun getWishList(
+        limit: Int,
+        page: Int,
+        description_length: Int,
+    ): Response<WishlistResponse>? {
+        return RetrofitClient.apiService.getWishList(limit, page, description_length)
+    }
+
+    override suspend fun getAllCart(): Response<Cart>? {
+        return RetrofitClient.apiService.getAllCart()
+    }
     override suspend fun getCategory(): Response<CategoryList>? {
         return RetrofitClient.apiService.getCategory()
     }

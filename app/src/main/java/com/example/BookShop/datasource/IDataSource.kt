@@ -5,7 +5,7 @@ import okhttp3.MultipartBody
 import retrofit2.Response
 
 interface IDataSource {
-    suspend fun login(email: String, password:String):Response<LoginResponse>?
+    suspend fun login(email: String, password: String): Response<LoginResponse>?
     suspend fun getSearchProducts(
         limit: Int,
         page: Int,
@@ -73,5 +73,12 @@ interface IDataSource {
     suspend fun addCartItem(productId: Int): Response<List<CartItem>>?
     suspend fun addItemToWishList(productId: Int): Response<Messeage>?
     suspend fun removeItemInWishList(productId: Int): Response<Messeage>
+    suspend fun getWishList(
+        limit: Int,
+        page: Int,
+        description_length: Int,
+    ): Response<WishlistResponse>?
+
+    suspend fun getAllCart():Response<Cart>?
     suspend fun getCategory(): Response<CategoryList>?
 }

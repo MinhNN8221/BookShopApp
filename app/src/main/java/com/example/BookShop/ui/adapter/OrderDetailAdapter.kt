@@ -49,7 +49,7 @@ class OrderDetailAdapter :
             binding.textNumber.text = "x" + orderDetailProduct.quantity.toString()
             if (orderDetailProduct.wishlist == 0) {
                 binding.imageFavorite.setBackgroundResource(R.drawable.bg_ellipse)
-                binding.imageFavorite.setImageResource(R.drawable.favor_white)
+                binding.imageFavorite.setImageResource(R.drawable.ic_favor_white)
             }
         }
     }

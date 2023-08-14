@@ -1,0 +1,112 @@
+package com.example.BookShop.ui.adapter
+
+import android.annotation.SuppressLint
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.RelativeSizeSpan
+import android.text.style.StrikethroughSpan
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.BookShop.R
+import com.example.BookShop.data.model.Cart
+import com.example.BookShop.data.model.CartItem
+import com.example.BookShop.databinding.ItemCartBinding
+import com.example.BookShop.utils.FormatMoney
+
+class CartAdapter() : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
+    private var formatMoney = FormatMoney()
+    private var cartItemList: MutableList<CartItem> = mutableListOf()
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartAdapter.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemCartBinding.inflate(inflater, parent, false)
+        return ViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: CartAdapter.ViewHolder, position: Int) {
+        val cartItem = cartItemList[position]
+        holder.bind(cartItem)
+    }
+
+    override fun getItemCount(): Int {
+        return cartItemList.size
+    }
+
+    fun getTotalPrice(): Double {
+        var totalPrice = 0.0
+        for (cartItem in cartItemList) {
+            cartItem.subTotal?.toDouble()?.let { price ->
+                totalPrice += price
+            }
+        }
+        return totalPrice
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setData(cartItem: List<CartItem>) {
+        cartItemList.clear()
+        cartItemList.addAll(cartItem)
+        notifyDataSetChanged()
+    }
+
+    inner class ViewHolder(private val binding: ItemCartBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(cartItem: CartItem) {
+            Glide.with(binding.root)
+                .load(cartItem.image)
+                .centerCrop()
+                .into(binding.imageProduct)
+            binding.textName.text = cartItem.name
+            binding.textQuantity.text = cartItem.quantity.toString()
+            if (cartItem.discountedPrice != null) {
+                val layoutParams =
+                    binding.imageFavorite.layoutParams as ViewGroup.MarginLayoutParams
+                val newMarginBottomInDp = 13
+                binding.textDiscountPrice.visibility = View.VISIBLE
+                layoutParams.bottomMargin = dpToPx(binding.root, newMarginBottomInDp)
+                binding.imageFavorite.layoutParams = layoutParams
+                binding.textDiscountPrice.text =
+                    cartItem.discountedPrice?.toDouble()
+                        ?.let { formatMoney.formatMoney(it.toLong()) }
+                binding.textPrice.text = setPrice(
+                    cartItem.price?.toDouble()
+                        ?.let { formatMoney.formatMoney(it.toLong()) }.toString()
+                )
+            } else {
+                binding.textPrice.text = cartItem.price?.toDouble()
+                    ?.let { formatMoney.formatMoney(it.toLong()) }
+            }
+            if (cartItem.wishlist == 1) {
+                binding.imageFavorite.setBackgroundResource(R.drawable.bg_ellipse_favor)
+                binding.imageFavorite.setImageResource(R.drawable.ic_favorite)
+            } else {
+                binding.imageFavorite.setBackgroundResource(R.drawable.bg_ellipse)
+                binding.imageFavorite.setImageResource(R.drawable.ic_favor_white)
+            }
+        }
+    }
+
+    private fun setPrice(price: String): SpannableString {
+        val content = SpannableString(price)
+        content.setSpan(
+            StrikethroughSpan(),
+            0,
+            price.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        content.setSpan(
+            RelativeSizeSpan(12 / 14f),
+            0,
+            price.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        return content
+    }
+
+    private fun dpToPx(view: View, dp: Int): Int {
+        val scale = view.resources.displayMetrics.density
+        return (dp * scale + 0.5f).toInt()
+    }
+}

@@ -48,7 +48,7 @@ class SignInFragment : Fragment() {
         initViewModel()
         val accessToken = MySharedPreferences.getAccessToken(null)
         if (accessToken != null) {
-            navigateToMainScreen()
+            navToMainScreen()
             RetrofitClient.updateAccessToken(accessToken)
         }
         binding?.apply {
@@ -79,9 +79,11 @@ class SignInFragment : Fragment() {
                     editPassword.transformationMethod =
                         HideReturnsTransformationMethod.getInstance()
                     checkVisible = true
+                    imageEye.setImageResource(R.drawable.ic_hide_eye)
                 } else {
                     editPassword.transformationMethod = PasswordTransformationMethod.getInstance()
                     checkVisible = false
+                    imageEye.setImageResource(R.drawable.ic_visible_eye)
                 }
                 if (cursorPosition >= 0) {
                     editPassword.setSelection(cursorPosition)
@@ -93,7 +95,7 @@ class SignInFragment : Fragment() {
     fun initViewModel() {
         viewModel.loginResponse.observe(viewLifecycleOwner) {
             if (it.checkLogin) {
-                navigateToMainScreen()
+                navToMainScreen()
                 it.loginResponse?.let { loginResponse ->
                     MySharedPreferences.putAccessToken(loginResponse.accessToken)
                     RetrofitClient.updateAccessToken(loginResponse.accessToken)
@@ -111,7 +113,7 @@ class SignInFragment : Fragment() {
         }
     }
 
-    fun navigateToMainScreen() {
+    fun navToMainScreen() {
         val fragment = MainMenuFragment()
         val fragmentManager = requireActivity().supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
