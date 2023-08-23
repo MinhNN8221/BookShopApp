@@ -67,17 +67,14 @@ class OrderDetailFragment : Fragment() {
     fun bindData(it: OrderDetail, orderStatus: String) {
         binding?.apply {
             textIdOrder.text = "#Order" + it.orderId
-            textPro.text = resources.getString(R.string.product).capitalize()
             textOrderDate.text =
-                resources.getString(R.string.createdOn) + " " + formatDate.formatDate(it.createdOn)
+                textOrderDate.text.toString() + " " + formatDate.formatDate(it.createdOn)
             textOrderAddress.text =
-                resources.getString(R.string.orderAddress) + " " + it.address
+                textOrderAddress.text.toString() + " " + it.address
             textOrderSum.text =
-                resources.getString(R.string.orderQuantity) + " " + it.products.size
-            textStatus.text = resources.getString(R.string.textStatus) + " "
-            textOrderStatus.text = orderStatus
-            textTotal.text = resources.getString(R.string.textTotal) + " "
-            textTotalMoney.text = it.orderTotal?.let { orderTotal ->
+                textOrderSum.text.toString() + " " + it.products.size
+            textOrderStatus.text = " $orderStatus"
+            textTotalMoney.text = " " + it.orderTotal?.let { orderTotal ->
                 formatMoney.formatMoney(
                     orderTotal.toDouble().toLong()
                 )

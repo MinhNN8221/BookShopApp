@@ -30,9 +30,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/swipe_refresh"
         android:layout_marginTop="25dp"
         app:layout_constraintBottom_toTopOf="@id/constraint"
         app:layout_constraintEnd_toEndOf="@id/image_profile"
@@ -50,9 +50,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="25dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

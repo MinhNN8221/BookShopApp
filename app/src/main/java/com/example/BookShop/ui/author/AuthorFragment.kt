@@ -138,6 +138,12 @@ class AuthorFragment : Fragment() {
                 }
                 false
             }
+            swipeRefresh.setOnRefreshListener {
+                Handler().postDelayed({
+                    swipeRefresh.isRefreshing = false
+                    authorId?.let { viewModel.getAuthor(it) }
+                }, 1000)
+            }
         }
         binding?.apply {
             recyclerAuthor.addOnScrollListener(object : RecyclerView.OnScrollListener() {

@@ -1,11 +1,14 @@
-package com.example.BookShop.ui.auth.signin
+package com.example.BookShop.ui.auth.signup
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.BookShop.data.model.*
+import com.example.BookShop.data.model.AuthResponse
+import com.example.BookShop.data.model.AuthState
+import com.example.BookShop.data.model.Error
+import com.example.BookShop.data.model.ErrorResponse
 import com.example.BookShop.data.repository.auth.AuthRepository
 import com.example.BookShop.data.repository.auth.AuthRepositoryImp
 import com.example.BookShop.datasource.remote.RemoteDataSource
@@ -13,15 +16,14 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SignInViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
-    private var _loginResponse = MutableLiveData<AuthState>()
-    val loginResponse: LiveData<AuthState> get() = _loginResponse
+class SignUpViewModel : ViewModel() {
+    private var _registerResponse = MutableLiveData<AuthState>()
+    val registerResponse: LiveData<AuthState> get() = _registerResponse
     private val authRepository: AuthRepository = AuthRepositoryImp(RemoteDataSource())
-    fun checkFields(user: AuthResponse) {
 
-        if (user.isSignInFieldEmpty()) {
-            _loginResponse.postValue(
+    fun checkFields(user: AuthResponse) {
+        if (user.isSignUpFieldEmpty()) {
+            _registerResponse.postValue(
                 AuthState(
                     Error(message = "Fields cannot be empty!"),
                     null
@@ -29,9 +31,8 @@ class SignInViewModel : ViewModel() {
             )
             return
         }
-
         if (!user.isValidEmail()) {
-            _loginResponse.postValue(
+            _registerResponse.postValue(
                 AuthState(
                     Error(message = "Please enter a valid email address!"),
                     null
@@ -39,9 +40,8 @@ class SignInViewModel : ViewModel() {
             )
             return
         }
-
         if (!user.isPasswordGreaterThan4()) {
-            _loginResponse.postValue(
+            _registerResponse.postValue(
                 AuthState(
                     Error(
                         message =
@@ -52,33 +52,39 @@ class SignInViewModel : ViewModel() {
             )
             return
         }
-        checkLogin(user)
-
+        if (!user.isPasswordMatch(user.customer.password)) {
+            _registerResponse.postValue(AuthState(Error(message = "Passwords don't match!"), null))
+            return
+        }
+        signUp(user)
     }
 
-    fun checkLogin(user: AuthResponse) {
+    private fun signUp(user: AuthResponse) {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = authRepository.login(user.customer.email, user.customer.password)
-            if (response?.isSuccessful == true) {
-                _loginResponse.postValue(
+            val response = authRepository.register(
+                user.customer.email,
+                user.customer.name,
+                user.customer.password
+            )
+            if (response.isSuccessful == true) {
+                _registerResponse.postValue(
                     AuthState(
-                        Error(message = "Login Successful!"),
+                        Error(message = "Register Successful!"),
                         response.body()
                     )
                 )
             } else {
-                val errorBody = response?.errorBody()?.string()
+                val errorBody = response.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ErrorResponse::class.java)
-                _loginResponse.postValue(
+                _registerResponse.postValue(
                     AuthState(
                         Error(message = errorResponse.error.message),
                         null
                     )
                 )
-                Log.d("LoginNull", "NULL")
+                Log.d("RegisterNull", "NULL")
             }
         }
     }
-
 }

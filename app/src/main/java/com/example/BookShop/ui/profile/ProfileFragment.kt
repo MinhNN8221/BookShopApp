@@ -7,17 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.example.BookShop.R
 import com.example.BookShop.data.model.Customer
 import com.example.BookShop.databinding.FragmentProfileBinding
+import com.example.BookShop.databinding.LayoutAlertBinding
 import com.example.BookShop.ui.order.orderhistory.OrderHistoryFragment
 import com.example.BookShop.ui.profile.changepass.ChangePassFragment
-import com.example.BookShop.ui.profile.profilesignin.ProfileSigninFragment
+import com.example.BookShop.ui.profile.profilesignin.ProfileSignInFragment
 import com.example.BookShop.ui.profile.updateprofile.UpdateProfileFragment
+import com.example.BookShop.utils.LoadingProgressBar
 import com.example.BookShop.utils.MySharedPreferences
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ProfileFragment : Fragment() {
     private var binding: FragmentProfileBinding? = null
@@ -27,6 +29,7 @@ class ProfileFragment : Fragment() {
     }
 
     private lateinit var viewModel: ProfileViewModel
+    private lateinit var loadingProgressBar: LoadingProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,14 +39,18 @@ class ProfileFragment : Fragment() {
         return binding?.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, ProfileViewModelFactory(requireActivity().application))[ProfileViewModel::class.java]
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.layoutLoading?.root?.visibility = View.VISIBLE
+        viewModel = ViewModelProvider(
+            this, ProfileViewModelFactory(requireActivity().application)
+        )[ProfileViewModel::class.java]
+        loadingProgressBar = LoadingProgressBar(requireContext())
+        val bindingAlert = LayoutAlertBinding.inflate(LayoutInflater.from(context))
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialogTheme)
+            .setView(bindingAlert.root)
+        val dialog = builder.create()
+        dialog.setCancelable(false)
+        loadingProgressBar.show()
         var email = ""
         activity?.let { MySharedPreferences.init(it.applicationContext) }
         viewModel.profile.observe(viewLifecycleOwner, Observer {
@@ -57,22 +64,34 @@ class ProfileFragment : Fragment() {
             }
             imageUpdate.setOnClickListener {
                 val fragmentUpdate = UpdateProfileFragment()
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.container, fragmentUpdate)
-                    .addToBackStack("profile")
-                    .commit()
+                parentFragmentManager.beginTransaction().replace(R.id.container, fragmentUpdate)
+                    .addToBackStack("profile").commit()
             }
             textClear.setOnClickListener {
-                MySharedPreferences.clearDataCache()
-                viewModel.clearDatabase()
-                Toast.makeText(context, "CLEAR SUCCESSFUL", Toast.LENGTH_SHORT).show()
+                bindingAlert.textDescription.text = resources.getString(R.string.clearData)
+                bindingAlert.textConfirm.setOnClickListener {
+                    MySharedPreferences.clearDataCache()
+                    viewModel.clearDatabase()
+                    Toast.makeText(context, "CLEAR SUCCESSFUL", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+                bindingAlert.textCancel.setOnClickListener {
+                    dialog.dismiss()
+                }
+                dialog.show()
             }
             textLogout.setOnClickListener {
-                MySharedPreferences.clearPreferences()
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.container, ProfileSigninFragment())
-                    .addToBackStack("profile")
-                    .commit()
+                bindingAlert.textDescription.text = resources.getString(R.string.sign_out_message)
+                bindingAlert.textConfirm.setOnClickListener {
+                    MySharedPreferences.clearPreferences()
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.container, ProfileSignInFragment()).commit()
+                    dialog.dismiss()
+                }
+                bindingAlert.textCancel.setOnClickListener {
+                    dialog.dismiss()
+                }
+                dialog.show()
             }
             textChange.setOnClickListener {
                 val fragmentChangePass = ChangePassFragment()
@@ -80,13 +99,11 @@ class ProfileFragment : Fragment() {
                 bundle.putString("email", email)
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, fragmentChangePass.apply { arguments = bundle })
-                    .addToBackStack("profile")
-                    .commit()
+                    .addToBackStack("profile").commit()
             }
             linearMyOrder.setOnClickListener {
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.container, OrderHistoryFragment())
-                    .addToBackStack("profile")
+                    .replace(R.id.container, OrderHistoryFragment()).addToBackStack("profile")
                     .commit()
             }
         }
@@ -96,21 +113,19 @@ class ProfileFragment : Fragment() {
         val imgAvatar = MySharedPreferences.getString("imageAvatar", "")
         if (imgAvatar != "") {
             binding?.apply {
-                Glide.with(root)
-                    .load(imgAvatar)
-                    .centerCrop()
-                    .into(imageAvatar)
+                Glide.with(root).load(imgAvatar).centerCrop().into(imageAvatar)
             }
         } else {
-            binding?.apply {
-                Glide.with(root)
-                    .load(profile.avatar)
-                    .centerCrop()
-                    .into(imageAvatar)
+            if (profile.avatar == "") {
+                binding?.imageAvatar?.setImageResource(R.drawable.account_profile)
+            } else {
+                binding?.apply {
+                    Glide.with(root).load(profile.avatar).centerCrop().into(imageAvatar)
+                }
             }
         }
         binding?.textName?.text = profile.name
         binding?.textMail?.text = profile.email
-        binding?.layoutLoading?.root?.visibility = View.INVISIBLE
+        loadingProgressBar.cancel()
     }
 }

@@ -1,15 +1,29 @@
 package com.example.BookShop.datasource.remote
 
+import android.util.Log
 import com.example.BookShop.data.api.RetrofitClient
 import com.example.BookShop.data.model.*
 import com.example.BookShop.datasource.IDataSource
 import okhttp3.MultipartBody
+import retrofit2.Call
 import retrofit2.Response
 
 class RemoteDataSource() : IDataSource {
 
-    override suspend fun login(email: String, password: String): Response<LoginResponse>? {
+    override suspend fun login(email: String, password: String): Response<AuthResponse>? {
         return RetrofitClient.apiService.login(email, password)
+    }
+
+    override suspend fun forgotPassword(email: String): Response<Messeage> {
+        return RetrofitClient.apiService.fotgotPass(email)
+    }
+
+    override suspend fun register(
+        email: String,
+        name: String,
+        password: String,
+    ): Response<AuthResponse> {
+        return RetrofitClient.apiService.register(email, name, password)
     }
 
     override suspend fun getSearchProducts(
@@ -157,6 +171,7 @@ class RemoteDataSource() : IDataSource {
     override suspend fun getAllCart(): Response<Cart>? {
         return RetrofitClient.apiService.getAllCart()
     }
+
     override suspend fun getCategory(): Response<CategoryList>? {
         return RetrofitClient.apiService.getCategory()
     }

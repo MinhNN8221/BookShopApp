@@ -6,9 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.BookShop.data.model.Customer
+import com.example.BookShop.data.model.ErrorResponse
 import com.example.BookShop.data.repository.user.UserRepository
 import com.example.BookShop.data.repository.user.UserRepositoryImp
 import com.example.BookShop.datasource.remote.RemoteDataSource
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
@@ -44,7 +46,10 @@ class UpdateProfileViewModel : ViewModel() {
             if (response?.isSuccessful == true) {
                 _message.postValue("UPDATE SUCCESSFUL!")
             } else {
-                _message.postValue("UPDATE FAILURE!")
+                val errorBody=response?.errorBody()?.string()
+                val gson=Gson()
+                val errorResponse=gson.fromJson(errorBody, ErrorResponse::class.java)
+                _message.postValue(errorResponse.error.message)
             }
         }
     }

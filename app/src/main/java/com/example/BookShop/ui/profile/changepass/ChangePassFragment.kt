@@ -1,17 +1,24 @@
 package com.example.BookShop.ui.profile.changepass
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.example.BookShop.R
+import com.example.BookShop.data.model.AuthResponse
+import com.example.BookShop.data.model.Customer
 import com.example.BookShop.databinding.FragmentChangePassBinding
+import com.example.BookShop.utils.AlertMessageViewer
 
 class ChangePassFragment : Fragment() {
 
@@ -36,30 +43,37 @@ class ChangePassFragment : Fragment() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this).get(ChangePassViewModel::class.java)
     }
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.imageLeft?.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
+        initViewModel()
         binding?.apply {
+            layoutChangePassword.setOnTouchListener { view, motionEvent ->
+                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    val event =
+                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    event.hideSoftInputFromWindow(requireView().windowToken, 0)
+                }
+                false
+            }
             textUpdatePassword.setOnClickListener {
                 val email = arguments?.getString("email").toString()
                 val oldPass = editCurrentPass.text.toString()
                 val newPass = editNewPass.text.toString()
                 val confirmPass = editConfirm.text.toString()
-                if (newPass == confirmPass) {
-                    if(oldPass.length<5 || newPass.length<5){
-                        Toast.makeText(context, "Mật khẩu lớn hơn =5 kí tự", Toast.LENGTH_SHORT).show()
-                    }else{
-                        viewModel.changePassword(email, oldPass, newPass)
-                        viewModel.message.observe(viewLifecycleOwner, Observer {
-                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                        })
-                    }
-                }
-                else {
-                    Toast.makeText(context, "Confirm failure", Toast.LENGTH_SHORT).show()
-                }
+                val user = AuthResponse(
+                    customer = Customer(
+                        email = email,
+                        password = oldPass,
+                        newPassword = newPass,
+                        passwordAgain = confirmPass
+                    )
+                )
+                viewModel.checkFields(user)
             }
             imageEyeCurrentPass.setOnClickListener {
                 val cursorPosition = editCurrentPass.selectionEnd
@@ -69,7 +83,8 @@ class ChangePassFragment : Fragment() {
                     checkVisible = true
                     imageEyeCurrentPass.setImageResource(R.drawable.ic_hide_eye)
                 } else {
-                    editCurrentPass.transformationMethod = PasswordTransformationMethod.getInstance()
+                    editCurrentPass.transformationMethod =
+                        PasswordTransformationMethod.getInstance()
                     checkVisible = false
                     imageEyeCurrentPass.setImageResource(R.drawable.ic_visible_eye)
                 }
@@ -85,7 +100,7 @@ class ChangePassFragment : Fragment() {
                     checkVisibleNewPass = true
                     imageEyeNewPass.setImageResource(R.drawable.ic_hide_eye)
                 } else {
-                    editCurrentPass.transformationMethod = PasswordTransformationMethod.getInstance()
+                    editNewPass.transformationMethod = PasswordTransformationMethod.getInstance()
                     checkVisibleNewPass = false
                     imageEyeNewPass.setImageResource(R.drawable.ic_visible_eye)
                 }
@@ -109,6 +124,12 @@ class ChangePassFragment : Fragment() {
                     editConfirm.setSelection(cursorPosition)
                 }
             }
+        }
+    }
+
+    private fun initViewModel() {
+        viewModel.message.observe(viewLifecycleOwner){ message ->
+            AlertMessageViewer.showAlertDialogMessage(requireContext(), message)
         }
     }
 }

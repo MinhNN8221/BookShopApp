@@ -5,22 +5,28 @@ import com.google.gson.annotations.SerializedName
 
 data class Customer(
     @SerializedName("customer_id")
-    val customer_id: Int?,
+    var customerId: Int? = null,
     @SerializedName("name")
-    val name: String?,
+    var name: String = "",
     @SerializedName("email")
-    val email: String?,
+    var email: String = "",
+    @SerializedName("password")
+    var password: String = "",
+    @SerializedName("new_pass")
+    var newPassword: String = "",
+    @SerializedName("password_again")
+    var passwordAgain: String = "",
     @SerializedName("address")
-    val address: String?,
+    var address: String? = null,
     @SerializedName("shipping_region_id")
-    val shipping_region_id: Int?,
+    var shippingRegionId: Int? = null,
     @SerializedName("mob_phone")
-    val mob_phone: String?,
+    var mobPhone: String? = null,
     @SerializedName("gender")
-    val gender: String?,
+    var gender: String? = null,
     @SerializedName("date_of_birth")
-    val date_of_birth: String?,
+    var dateOfBirth: String? = null,
     @SerializedName("avatar")
-    val avatar: String?
+    var avatar: String? = null,
 )
 

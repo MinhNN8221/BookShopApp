@@ -21,6 +21,7 @@ import com.example.BookShop.ui.author.AuthorFragment
 import com.example.BookShop.ui.profile.ProfileFragment
 import com.example.BookShop.ui.publisher.PublisherFragment
 import com.example.BookShop.utils.FormatMoney
+import com.example.BookShop.utils.LoadingProgressBar
 import com.example.BookShop.utils.MySharedPreferences
 
 class ProductdetailFragment : Fragment() {
@@ -30,6 +31,7 @@ class ProductdetailFragment : Fragment() {
     private val formatMoney = FormatMoney()
     private var authorId = 0
     private var publisherId = 0
+    private lateinit var loadingProgressBar: LoadingProgressBar
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -46,7 +48,8 @@ class ProductdetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
-        binding?.loadingLayout?.root?.visibility = View.VISIBLE
+        loadingProgressBar = LoadingProgressBar(requireContext())
+        loadingProgressBar.show()
         val productId = arguments?.getString("bookId")?.toInt()
         productId?.let {
             viewModel.getProductInfo(it)
@@ -133,21 +136,17 @@ class ProductdetailFragment : Fragment() {
                 .centerCrop()
                 .into(imagePro)
             textName.text = productInfoList.product.name
-            textNum.text = resources.getString(R.string.quantity)
             textMa.text =
-                resources.getString(R.string.productId) + " " + productInfoList.product.productId
+                textMa.text.toString() + " " + productInfoList.product.productId
             textDescription.text = productInfoList.product.description
             textPrice.text =
                 formatMoney.formatMoney(productInfoList.product.price.toDouble().toLong())
-            textAuthor.text = resources.getString(R.string.author) + ": "
-            textNameAuthor.text = setAuthorName(productInfoList.author.authorName)
+            textNameAuthor.text =
+                textNameAuthor.text.toString() + " " + setAuthorName(productInfoList.author.authorName)
             textNcc.text =
-                resources.getString(R.string.supplier) + ": " + productInfoList.supplier.supplier_name
-            textYear.text = resources.getString(R.string.year)
-            textLanguage.text = resources.getString(R.string.language)
+                textNcc.text.toString() + " " + productInfoList.supplier.supplier_name
             readmore.text = resources.getString(R.string.readmore)
             textPublish.text = productInfoList.supplier.supplier_name
-            textPriceName.text = resources.getString(R.string.price)
             val wishListPre = MySharedPreferences.getInt("wishlist", -1)
             val productIdPre = MySharedPreferences.getInt("productId", -1)
             if (wishListPre != -1 && productIdPre == productInfoList.product.productId) {
@@ -167,7 +166,7 @@ class ProductdetailFragment : Fragment() {
                     binding?.imageFavorite?.setBackgroundResource(R.drawable.bg_ellipse)
                 }
             }
-            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
+            loadingProgressBar.cancel()
         }
     }
 

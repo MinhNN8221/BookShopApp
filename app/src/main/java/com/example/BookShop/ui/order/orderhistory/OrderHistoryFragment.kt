@@ -69,6 +69,9 @@ class OrderHistoryFragment : Fragment() {
                         list.add(OrderHistory(null, values))
                     }
                 }
+                if (list.isEmpty()) {
+                    binding?.textOrderHistory?.visibility = View.VISIBLE
+                }
                 adapter.setData(list)
                 navToOrderDetail()
                 binding?.loadingLayout?.root?.visibility = View.INVISIBLE

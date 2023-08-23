@@ -51,7 +51,7 @@
     <string name="introduce">Good books, like good friends, are few and chosen; the more select, the more enjoyable</string>
     <string name="supplier">Tên NCC:</string>
     <string name="year">Năm XB: 2022</string>
-    <string name="product">sản phẩm</string>
+    <string name="product">Sản Phẩm</string>
     <string name="createdOn">Ngày đặt hàng :</string>
     <string name="orderAddress">Địa chỉ giao hàng :</string>
     <string name="orderQuantity">Tổng số lượng :</string>
@@ -63,4 +63,6 @@
     <string name="readmore">Read more.</string>
     <string name="price">Price</string>
     <string name="deleteHistory">Xóa lịch sử tìm kiếm</string>
+    <string name="sign_out_message">Bạn có chắc chắn muốn đăng xuất tài khoản?</string>
+    <string name="clearData">Bạn có chắc chắn muốn xóa data &amp; cache?</string>
 </resources>

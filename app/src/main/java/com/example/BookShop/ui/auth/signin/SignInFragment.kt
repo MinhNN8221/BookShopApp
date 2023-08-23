@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -16,8 +15,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.example.BookShop.R
 import com.example.BookShop.data.api.RetrofitClient
+import com.example.BookShop.data.model.Customer
+import com.example.BookShop.data.model.AuthResponse
 import com.example.BookShop.databinding.FragmentSignInBinding
+import com.example.BookShop.ui.auth.forgot.ForgotPasswordFragment
+import com.example.BookShop.ui.auth.signup.SignUpFragment
 import com.example.BookShop.ui.main.MainMenuFragment
+import com.example.BookShop.utils.AlertMessageViewer
+import com.example.BookShop.utils.LoadingProgressBar
 import com.example.BookShop.utils.MySharedPreferences
 
 class SignInFragment : Fragment() {
@@ -29,6 +34,7 @@ class SignInFragment : Fragment() {
     private lateinit var viewModel: SignInViewModel
     private var binding: FragmentSignInBinding? = null
     private var checkVisible = false
+    private lateinit var loadingProgressBar: LoadingProgressBar
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[SignInViewModel::class.java]
@@ -51,6 +57,7 @@ class SignInFragment : Fragment() {
             navToMainScreen()
             RetrofitClient.updateAccessToken(accessToken)
         }
+        loadingProgressBar = LoadingProgressBar(requireContext())
         binding?.apply {
             layoutSignIn.setOnTouchListener { view, motionEvent ->
                 if (motionEvent.action == MotionEvent.ACTION_DOWN) {
@@ -63,15 +70,22 @@ class SignInFragment : Fragment() {
             buttonLogin.setOnClickListener {
                 val username = editUsername.text.toString()
                 val password = editPassword.text.toString()
-                if (username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter username and password!!!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    viewModel.checkLogin(username, password)
-                }
+                val customer = Customer(email = username, password = password)
+                val user = AuthResponse(customer = customer)
+                viewModel.checkFields(user)
+                loadingProgressBar.show()
+            }
+            textForgotpass.setOnClickListener {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, ForgotPasswordFragment())
+                    .addToBackStack("SignIn")
+                    .commit()
+            }
+            textRegister.setOnClickListener {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, SignUpFragment())
+                    .addToBackStack("SignIn")
+                    .commit()
             }
             imageEye.setOnClickListener {
                 val cursorPosition = editPassword.selectionEnd
@@ -94,21 +108,24 @@ class SignInFragment : Fragment() {
 
     fun initViewModel() {
         viewModel.loginResponse.observe(viewLifecycleOwner) {
-            if (it.checkLogin) {
-                navToMainScreen()
-                it.loginResponse?.let { loginResponse ->
-                    MySharedPreferences.putAccessToken(loginResponse.accessToken)
-                    RetrofitClient.updateAccessToken(loginResponse.accessToken)
+            loadingProgressBar.cancel()
+            if (it?.loginResponse == null) {
+                it.error.message.let { it1 ->
+                    AlertMessageViewer.showAlertDialogMessage(
+                        requireContext(),
+                        it1
+                    )
                 }
-                it.loginResponse?.customer?.customer_id?.let { idCustomer ->
+            } else {
+                navToMainScreen()
+                MySharedPreferences.putAccessToken(it.loginResponse.accessToken)
+                RetrofitClient.updateAccessToken(it.loginResponse.accessToken)
+                it.loginResponse.customer.customerId?.let { idCustomer ->
                     MySharedPreferences.putInt(
                         "idCustomer",
                         idCustomer
                     )
                 }
-                Toast.makeText(requireContext(), "Login Successful!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(requireContext(), "Login Fail!", Toast.LENGTH_SHORT).show()
             }
         }
     }

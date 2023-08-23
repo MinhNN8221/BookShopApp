@@ -12,7 +12,21 @@ interface ApiInterface {
     suspend fun login(
         @Field("email") email: String,
         @Field("password") password: String,
-    ): Response<LoginResponse>
+    ): Response<AuthResponse>
+
+    @FormUrlEncoded
+    @POST("customers/forgotPass")
+    suspend fun fotgotPass(
+        @Field("email") email: String,
+    ): Response<Messeage>
+
+    @FormUrlEncoded
+    @POST("customers")
+    suspend fun register(
+        @Field("email") email: String,
+        @Field("name") name: String,
+        @Field("password") password: String,
+    ): Response<AuthResponse>
 
     @GET("products")
     suspend fun getProducts(): Response<ProductList>

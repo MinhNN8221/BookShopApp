@@ -97,6 +97,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:text="@string/quantity"
         android:textColor="@color/secondaryDeep"
         android:textSize="12dp"
         app:layout_constraintEnd_toEndOf="@+id/text_name"
@@ -136,6 +137,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/secondaryDeep"
                 android:textSize="14dp"
+                android:text="@string/productId"
                 app:layout_constraintEnd_toEndOf="@+id/text_info"
                 app:layout_constraintStart_toStartOf="@+id/text_info"
                 app:layout_constraintTop_toBottomOf="@+id/text_info" />
@@ -144,6 +146,7 @@
                 android:id="@+id/text_ncc"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:text="@string/supplier"
                 android:textColor="@color/secondaryDeep"
                 android:textSize="14dp"
                 app:layout_constraintEnd_toEndOf="@+id/text_info"
@@ -154,6 +157,7 @@
                 android:id="@+id/text_author"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:text="@string/author"
                 android:textColor="@color/secondaryDeep"
                 android:textSize="14dp"
                 app:layout_constraintStart_toStartOf="@+id/text_ncc"
@@ -173,6 +177,7 @@
                 android:id="@+id/text_year"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:text="@string/year"
                 android:textColor="@color/secondaryDeep"
                 android:textSize="14dp"
                 app:layout_constraintEnd_toEndOf="@+id/text_name_author"
@@ -185,6 +190,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/secondaryDeep"
                 android:textSize="14dp"
+                android:text="@string/language"
                 app:layout_constraintEnd_toEndOf="@+id/text_info"
                 app:layout_constraintStart_toStartOf="@+id/text_info"
                 app:layout_constraintTop_toBottomOf="@+id/text_year" />
@@ -207,6 +213,7 @@
                 android:textColor="@color/primary"
                 android:textSize="14dp"
                 android:textStyle="bold"
+                android:text="@string/readmore"
                 app:layout_constraintEnd_toEndOf="@+id/text_info"
                 app:layout_constraintStart_toStartOf="@+id/text_info"
                 app:layout_constraintTop_toBottomOf="@+id/text_description" />
@@ -300,6 +307,7 @@
             android:layout_marginTop="43.5dp"
             android:textColor="@color/secondary"
             android:textSize="14dp"
+            android:text="@string/price"
             app:layout_constraintBottom_toTopOf="@+id/text_price"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -310,6 +318,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="45.72dp"
+            android:text="0 VND"
             android:textColor="@color/white"
             android:textSize="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -335,10 +344,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <include
-        layout="@layout/layout_loading"
-        android:id="@+id/loadingLayout"
-        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

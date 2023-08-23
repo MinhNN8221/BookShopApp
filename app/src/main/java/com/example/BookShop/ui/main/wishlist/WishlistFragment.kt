@@ -94,4 +94,9 @@ class WishlistFragment : Fragment() {
             }
         })
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getWishList(10, 1, 100)
+    }
 }

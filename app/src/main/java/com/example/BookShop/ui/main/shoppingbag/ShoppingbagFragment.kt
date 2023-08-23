@@ -68,4 +68,8 @@ class ShoppingbagFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getAllCartItem()
+    }
 }

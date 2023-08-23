@@ -118,6 +118,15 @@ class CategoryBookFragment : Fragment() {
             imageLeft.setOnClickListener {
                 parentFragmentManager.popBackStack()
             }
+            swipeRefresh.setOnRefreshListener {
+                Handler().postDelayed({
+                    swipeRefresh.isRefreshing=false
+                    categoryId?.let {
+                        viewModel.getProductsInCategory(it, 10, currentPage, 100)
+                    }
+                },1000)
+            }
+            swipeRefresh.setColorSchemeColors(resources.getColor(R.color.teal_200))
         }
         binding?.apply {
             recyclerCategory.addOnScrollListener(object : RecyclerView.OnScrollListener() {

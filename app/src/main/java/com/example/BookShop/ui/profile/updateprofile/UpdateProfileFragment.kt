@@ -27,6 +27,7 @@ import com.example.BookShop.data.model.Customer
 import com.example.BookShop.databinding.FragmentUpdateProfileBinding
 import com.example.BookShop.ui.profile.permission.PermissionFragment
 import com.example.BookShop.utils.FormatDate
+import com.example.BookShop.utils.LoadingProgressBar
 import com.example.BookShop.utils.MySharedPreferences
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -46,6 +47,7 @@ class UpdateProfileFragment : Fragment() {
     private var customer_id: Int? = null
     private var avatar: String? = null
     private var shipping_region_id: Int? = null
+    private lateinit var loadingProgressBar: LoadingProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,7 +66,8 @@ class UpdateProfileFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding?.layoutLoading?.root?.visibility = View.VISIBLE
+        loadingProgressBar = LoadingProgressBar(requireContext())
+        loadingProgressBar.show()
         initViewModel()
         viewModel.getCustomer()
         activity?.let { MySharedPreferences.init(it.applicationContext) }
@@ -126,8 +129,8 @@ class UpdateProfileFragment : Fragment() {
         viewModel.profile.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 bindData(it)
-                customer_id = it.customer_id
-                shipping_region_id = it.shipping_region_id
+                customer_id = it.customerId
+                shipping_region_id = it.shippingRegionId
                 avatar = it.avatar
             }
         })
@@ -180,21 +183,23 @@ class UpdateProfileFragment : Fragment() {
                     .into(imageAvatar)
             }
         } else {
-            binding?.apply {
-                Glide.with(root)
-                    .load(profile.avatar)
-                    .centerCrop()
-                    .into(imageAvatar)
+            if (profile.avatar == "") {
+                binding?.imageAvatar?.setImageResource(R.drawable.account_profile)
+            } else {
+                binding?.apply {
+                    Glide.with(root)
+                        .load(profile.avatar)
+                        .centerCrop()
+                        .into(imageAvatar)
+                }
             }
         }
         binding?.apply {
             editFullname.setText(profile.name)
-            if (profile.date_of_birth != null) {
-                editDob.setText(FormatDate().formatDateOfBirthView(profile.date_of_birth.toString()))
-            } else {
-                editDob.setText(profile.date_of_birth)
+            profile.dateOfBirth?.let {
+                editDob.setText(FormatDate().formatDateOfBirthView(profile.dateOfBirth.toString()))
             }
-            editPhone.setText(profile.mob_phone)
+            editPhone.setText(profile.mobPhone)
             editAddress.setText(profile.address)
             editEmail.setText(profile.email)
             if (profile.gender.equals("Nam")) {
@@ -202,7 +207,7 @@ class UpdateProfileFragment : Fragment() {
             } else {
                 radiobtnNu.isChecked = true
             }
-            layoutLoading.root.visibility = View.INVISIBLE
+            loadingProgressBar.cancel()
         }
     }
 
@@ -211,7 +216,6 @@ class UpdateProfileFragment : Fragment() {
         val pattern = Regex("^0\\d{9}$")
         binding?.apply {
             val fullName = editFullname.text.toString()
-            val Dob = FormatDate().formatDateReverse(editDob.text.toString())
             var gender = "Nữ"
             if (radiobtnNam.isChecked) {
                 gender = "Nam"
@@ -219,9 +223,15 @@ class UpdateProfileFragment : Fragment() {
             val phone = editPhone.text.toString()
             val address = editAddress.text.toString()
             val checkPhone = pattern.matches(editPhone.text.toString())
-            if (checkPhone) {
+            if (checkPhone && editDob.text.toString().isNotEmpty()) {
+                val Dob = FormatDate().formatDateReverse(editDob.text.toString())
                 viewModel.updateCustomer(fullName, address, Dob, gender, phone)
-            } else {
+            } else if (editDob.text.toString().isEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Please enter the correct format of the date of birthday!", Toast.LENGTH_SHORT
+                ).show()
+            } else if (!checkPhone) {
                 Toast.makeText(
                     requireContext(),
                     "Please enter the correct format of the phone number!",
