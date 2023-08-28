@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.BookShop.data.model.Product
+import com.example.BookShop.data.model.ProductList
 import com.example.BookShop.data.model.ProductState
 import com.example.BookShop.data.repository.cart.CartRepository
 import com.example.BookShop.data.repository.cart.CartRepositoryImp
@@ -18,8 +20,8 @@ import kotlinx.coroutines.launch
 
 class CategoryBookViewModel : ViewModel() {
     // TODO: Implement the ViewModel
-    private var _productList = MutableLiveData<ProductState>()
-    val producList: LiveData<ProductState> get() = _productList
+    private var _productList = MutableLiveData<List<Product>>()
+    val producList: LiveData<List<Product>> get() = _productList
     private var productRepository: ProductRepository? = ProductRepositoryImp(RemoteDataSource())
     private var cartRepository: CartRepository? = CartRepositoryImp(RemoteDataSource())
     private var searchRepository: SearchRepository? = SearchRepositoryImp(RemoteDataSource())
@@ -28,7 +30,7 @@ class CategoryBookViewModel : ViewModel() {
             val response =
                 productRepository?.getProductsByCategory(categoryId, limit, page, desLength)
             if (response?.isSuccessful == true) {
-                _productList.postValue(ProductState(response.body()?.products, true))
+                _productList.postValue(response.body()?.products)
             } else {
                 Log.d("CategroBookNULL", "NULL")
             }
@@ -39,7 +41,6 @@ class CategoryBookViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = cartRepository?.addCartItem(productId)
             if (response?.isSuccessful == true) {
-                Log.d("SUCCESSFUL", "OK")
             } else {
                 Log.d("ADDITEMTOCARTNULL", "NULL")
             }
@@ -56,7 +57,7 @@ class CategoryBookViewModel : ViewModel() {
                 categoryId,
             )
             if (response?.isSuccessful == true) {
-                _productList.postValue(ProductState(response.body()?.products, false))
+                _productList.postValue(response.body()?.products)
             } else {
                 Log.d("SearchCategory", "NULL")
             }

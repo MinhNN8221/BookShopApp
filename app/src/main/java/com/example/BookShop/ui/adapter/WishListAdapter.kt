@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.BookShop.data.model.Product
 import com.example.BookShop.data.model.Wishlist
 import com.example.BookShop.databinding.ItemWishlistBinding
 import com.example.BookShop.utils.FormatMoney

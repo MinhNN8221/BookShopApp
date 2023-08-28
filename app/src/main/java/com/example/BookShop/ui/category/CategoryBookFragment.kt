@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -21,11 +20,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.BookShop.R
 import com.example.BookShop.data.model.Product
 import com.example.BookShop.databinding.FragmentCategoryBookBinding
-import com.example.BookShop.ui.adapter.BookAdapter
+import com.example.BookShop.ui.adapter.ProductAdapter
 import com.example.BookShop.ui.adapter.OnItemClickListener
 import com.example.BookShop.ui.productdetail.ProductdetailFragment
 import com.example.BookShop.utils.ItemSpacingDecoration
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class CategoryBookFragment : Fragment() {
 
@@ -35,7 +33,7 @@ class CategoryBookFragment : Fragment() {
 
     private lateinit var viewModel: CategoryBookViewModel
     private var binding: FragmentCategoryBookBinding? = null
-    private lateinit var adapter: BookAdapter
+    private lateinit var adapter: ProductAdapter
     private lateinit var layoutManager: GridLayoutManager
     private var bookList = mutableListOf<Product>()
     private var currentPage = 1
@@ -60,12 +58,14 @@ class CategoryBookFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = BookAdapter()
+        adapter = ProductAdapter()
         initViewModel()
+        navToProductDetail()
         val categoryId = arguments?.getString("categoryId")?.toInt()
-        val categoryName=arguments?.getString("categoryName")
+        val categoryName = arguments?.getString("categoryName")
         categoryId?.let {
             viewModel.getProductsInCategory(it, 10, currentPage, 100)
+            handleSearch(categoryId)
         }
         val horizontalSpacing =
             resources.getDimensionPixelSize(R.dimen.horizontal_spacing)
@@ -73,31 +73,6 @@ class CategoryBookFragment : Fragment() {
             resources.getDimensionPixelSize(R.dimen.vertical_spacing)
         binding?.apply {
             textCategory.text = categoryName
-            searchProduct.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String): Boolean {
-                    // task HERE
-                    return false
-                }
-
-                override fun onQueryTextChange(newText: String): Boolean {
-                    if (newText.isEmpty()) {
-                        currentPage = 1
-                        categoryId?.let { categoryId ->
-                            viewModel.getProductsInCategory(categoryId, 10, 1, 100)
-                        }
-                        loadingLayout.root.visibility = View.VISIBLE
-                    } else {
-                        val delayMillis = 300L
-                        searchHandler.removeCallbacksAndMessages(null)
-                        searchHandler.postDelayed({
-                            categoryId?.let {
-                                viewModel.getSearchCategoryProducts(it, 1, newText)
-                            }
-                        }, delayMillis)
-                    }
-                    return false;
-                }
-            })
             layoutCategory.setOnTouchListener { view, motionEvent ->
                 if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                     val event =
@@ -120,14 +95,48 @@ class CategoryBookFragment : Fragment() {
             }
             swipeRefresh.setOnRefreshListener {
                 Handler().postDelayed({
-                    swipeRefresh.isRefreshing=false
+                    swipeRefresh.isRefreshing = false
                     categoryId?.let {
                         viewModel.getProductsInCategory(it, 10, currentPage, 100)
                     }
-                },1000)
+                }, 1000)
             }
             swipeRefresh.setColorSchemeColors(resources.getColor(R.color.teal_200))
         }
+        categoryId?.let { handleLoadData(it) }
+    }
+
+    private fun handleSearch(categoryId: Int) {
+        binding?.apply {
+            searchProduct.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    // task HERE
+                    return false
+                }
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    if (newText.isEmpty()) {
+                        currentPage = 1
+                        categoryId.let { categoryId ->
+                            viewModel.getProductsInCategory(categoryId, 10, 1, 100)
+                        }
+                        loadingLayout.root.visibility = View.VISIBLE
+                    } else {
+                        val delayMillis = 300L
+                        searchHandler.removeCallbacksAndMessages(null)
+                        searchHandler.postDelayed({
+                            categoryId.let {
+                                viewModel.getSearchCategoryProducts(it, 1, newText)
+                            }
+                        }, delayMillis)
+                    }
+                    return false;
+                }
+            })
+        }
+    }
+
+    private fun handleLoadData(categoryId: Int) {
         binding?.apply {
             recyclerCategory.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -137,7 +146,7 @@ class CategoryBookFragment : Fragment() {
                     totalPosition = adapter.itemCount
                     if (lastPosition != currentPosition && ((lastPosition == totalPosition - 3 && totalPosition % 2 == 0) || (lastPosition == totalPosition - 2 && totalPosition % 2 != 0))) {
                         currentPage++
-                        if (categoryId != null) {
+                        categoryId.let { categoryId ->
                             viewModel.getProductsInCategory(categoryId, 10, currentPage, 100)
                         }
                         currentPosition = lastPosition
@@ -168,30 +177,24 @@ class CategoryBookFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 val product = adapter.getBook(position)
                 viewModel.addItemToCart(product.product_id)
-                Toast.makeText(context, "ADD ITEM TO CART SUCCESSFUL", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Add item to cart successful", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun initViewModel() {
-        viewModel.producList.observe(viewLifecycleOwner, Observer { state ->
-            val isDefaultState = state.isDefaultState
-            state.products?.let {
-                if (pastPage != currentPage && isDefaultState) {
-                    if (currentPage > 1) {
-                        bookList.addAll(it)
-                    } else {
-                        bookList.clear()
-                        bookList.addAll(it)
-                    }
-                } else if (!isDefaultState) {
-                    bookList = it as MutableList<Product>
+        viewModel.producList.observe(viewLifecycleOwner, Observer { productList ->
+            if (pastPage != currentPage) {
+                if (currentPage > 1) {
+                    bookList.addAll(productList)
+                } else {
+                    bookList.clear()
+                    bookList.addAll(productList)
                 }
-                adapter.setData(bookList)
-                navToProductDetail()
-                addItemToCart()
-                binding?.loadingLayout?.root?.visibility = View.INVISIBLE
             }
+            adapter.setData(bookList)
+            addItemToCart()
+            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
         })
     }
 }

@@ -1,8 +1,8 @@
 package com.example.BookShop.data.api
 
+import androidx.room.Update
 import com.example.BookShop.data.model.*
 import okhttp3.MultipartBody
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -18,7 +18,7 @@ interface ApiInterface {
     @POST("customers/forgotPass")
     suspend fun fotgotPass(
         @Field("email") email: String,
-    ): Response<Messeage>
+    ): Response<Message>
 
     @FormUrlEncoded
     @POST("customers")
@@ -70,6 +70,15 @@ interface ApiInterface {
         @Query("category_id") categoryId: Int,
     ): Response<ProductList>
 
+    @GET("products/supplier/search")
+    suspend fun getSearchSupplierProducts(
+        @Query("supplier_id") supplierId: Int,
+        @Query("limit") limit: Int,
+        @Query("page") page: Int,
+        @Query("description_length") descriptionLength: Int,
+        @Query("query_string") queryString: String,
+    ): Response<ProductList>
+
     @GET("products/{product_id}")
     suspend fun getProductInfo(@Path("product_id") product_id: Int): Response<ProductInfoList>
 
@@ -84,6 +93,14 @@ interface ApiInterface {
     @GET("products/incategory/{categoryId}")
     suspend fun getProductsByCategory(
         @Path("categoryId") categoryId: Int,
+        @Query("limit") limit: Int,
+        @Query("page") page: Int,
+        @Query("description_length") description_length: Int,
+    ): Response<ProductList>
+
+    @GET("products/supplier")
+    suspend fun getProductsBySupplier(
+        @Query("supplier_id") supplierId: Int,
         @Query("limit") limit: Int,
         @Query("page") page: Int,
         @Query("description_length") description_length: Int,
@@ -117,16 +134,13 @@ interface ApiInterface {
     ): Response<Customer>
 
     @Multipart
-
     @POST("customers/update/avatar")
     suspend fun changeAvatar(
         @Part image: MultipartBody.Part,
     ): Response<Customer>
 
-
     @GET("orders")
     suspend fun getOrderHistory(): Response<OrderList>
-
 
     @GET("orders/{orderId}")
     suspend fun getOrderDetail(@Path("orderId") orderId: Int): Response<OrderDetail>
@@ -138,11 +152,28 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST("wishlist/add")
-    suspend fun addItemToWishList(@Field("product_id") productId: Int): Response<Messeage>
+    suspend fun addItemToWishList(@Field("product_id") productId: Int): Response<Message>
 
+    @POST("shoppingCart/add/wishlist")
+    suspend fun addAllItem2Cart(): Response<Message>
+
+    @DELETE("shoppingCart/empty")
+    suspend fun deleteAllItemCart(): Response<Message>
+
+    @FormUrlEncoded
+    @POST("shoppingCart/update")
+    suspend fun changeProductQuantityInCart(
+        @Field("item_id") itemId: Int,
+        @Field("quantity") quantity: Int,
+    ): Response<Message>?
+
+    @DELETE("shoppingCart/removeProduct/{item_id}")
+    suspend fun removeItemInCart(
+        @Path("item_id") itemId: Int,
+    ): Response<Message>?
 
     @DELETE("wishlist/remove/{product_id}")
-    suspend fun removeItemInWishList(@Path("product_id") productId: Int): Response<Messeage>
+    suspend fun removeItemInWishList(@Path("product_id") productId: Int): Response<Message>
 
     @GET("wishlist")
     suspend fun getWishList(
@@ -153,4 +184,14 @@ interface ApiInterface {
 
     @GET("shoppingCart")
     suspend fun getAllCart(): Response<Cart>?
+
+    @FormUrlEncoded
+    @POST("orders")
+    suspend fun createOrder(
+        @Field("cart_id") cartId: String,
+        @Field("shipping_id") shippingId: Int,
+        @Field("address") address: String,
+        @Field("receiver_name") receiverName: String,
+        @Field("receiver_phone") recieverPhone: String,
+    ): Response<Message>
 }

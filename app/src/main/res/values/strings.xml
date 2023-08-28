@@ -23,6 +23,7 @@
     <string name="signin">SIGN IN</string>
     <string name="changepassword">Change password</string>
     <string name="updateprofile">Update Profile</string>
+    <string name="checkout">Check Out</string>
     <string name="permission">Permission</string>
     <string name="create">Create new account</string>
     <string name="current">Current Pass</string>
@@ -41,6 +42,7 @@
     <string name="myOrder">Order</string>
     <string name="orderDetail">Order Detail</string>
     <string name="author">Tác giả</string>
+    <string name="publisher">NXB</string>
     <string name="category">Category</string>
     <string name="home_bar">Product</string>
     <string name="search_bar">Search</string>
@@ -63,6 +65,7 @@
     <string name="readmore">Read more.</string>
     <string name="price">Price</string>
     <string name="deleteHistory">Xóa lịch sử tìm kiếm</string>
+    <string name="deleteCart">Xóa tất cả</string>
     <string name="sign_out_message">Bạn có chắc chắn muốn đăng xuất tài khoản?</string>
     <string name="clearData">Bạn có chắc chắn muốn xóa data &amp; cache?</string>
 </resources>

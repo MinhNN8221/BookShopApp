@@ -2,6 +2,7 @@ package com.example.BookShop.ui.auth.signup
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.Handler
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.util.Log
@@ -9,6 +10,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.addCallback
 import com.example.BookShop.R
 import com.example.BookShop.data.api.RetrofitClient
 import com.example.BookShop.data.model.AuthResponse
@@ -27,6 +30,7 @@ class SignUpFragment : Fragment() {
 
     private lateinit var viewModel: SignUpViewModel
     private var binding: FragmentSignUpBinding? = null
+    private var doubleBackToExitPressedOnce = false
     private var checkVisiblePass = false
     private var checkVisibleConfirm = false
     private lateinit var loadingProgressBar: LoadingProgressBar
@@ -60,8 +64,6 @@ class SignUpFragment : Fragment() {
                 loadingProgressBar.show()
                 val user = AuthResponse(customer = customer)
                 viewModel.checkFields(user)
-//                layoutLoading.root.setBackgroundColor(resources.getColor(R.color.secondary))
-//                layoutLoading.root.visibility = View.VISIBLE
             }
             imageEyePassword.setOnClickListener {
                 val cursorPosition = editPassword.selectionEnd
@@ -102,16 +104,24 @@ class SignUpFragment : Fragment() {
                     .commit()
             }
         }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (doubleBackToExitPressedOnce) {
+                requireActivity().finish()
+            } else {
+                doubleBackToExitPressedOnce = true
+                Toast.makeText(requireContext(), "Nhấn back lần nữa để thoát", Toast.LENGTH_SHORT)
+                    .show()
+                Handler().postDelayed({
+                    doubleBackToExitPressedOnce = false
+                }, 2500)
+            }
+        }
     }
 
     private fun initViewModel() {
         viewModel.registerResponse.observe(viewLifecycleOwner) {
-//            binding?.layoutLoading?.root?.visibility = View.INVISIBLE
             loadingProgressBar.cancel()
             it?.let { authState ->
-//                authState.loginResponse?.let {
-//
-//                }
                 AlertMessageViewer.showAlertDialogMessage(
                     requireContext(),
                     authState.error.message

@@ -11,7 +11,7 @@ import com.example.BookShop.databinding.FragmentMainMenuBinding
 import com.example.BookShop.ui.adapter.ViewPager2Adapter
 import com.example.BookShop.ui.main.home.HomeFragment
 import com.example.BookShop.ui.main.search.SearchFragment
-import com.example.BookShop.ui.main.shoppingbag.ShoppingbagFragment
+import com.example.BookShop.ui.main.cart.CartFragment
 import com.example.BookShop.ui.main.wishlist.WishlistFragment
 
 class MainMenuFragment : Fragment() {
@@ -31,7 +31,7 @@ class MainMenuFragment : Fragment() {
             HomeFragment(),
             SearchFragment(),
             WishlistFragment(),
-            ShoppingbagFragment()
+            CartFragment()
         )
         val adapter = ViewPager2Adapter(requireActivity(), fragments)
         binding.viewPager.adapter = adapter
@@ -57,32 +57,5 @@ class MainMenuFragment : Fragment() {
                 false
             }
         }
-
-//        binding.navigation.setOnItemSelectedListener {
-//            when (it.itemId) {
-//                R.id.menu_home -> {
-//                    loadFragment(HomeFragment())
-//                    true
-//                }
-//                R.id.menu_search -> {
-//                    loadFragment(SearchFragment())
-//                    true
-//                }
-//                R.id.menu_wishlist -> {
-//                    loadFragment(WishlistFragment())
-//                    true
-//                }
-//                else -> {
-//                    loadFragment(ShoppingbagFragment())
-//                    true
-//                }
-//            }
-//        }
     }
-
-//    private fun loadFragment(fragment: Fragment) {
-//        val transaction = parentFragmentManager.beginTransaction()
-//        transaction.replace(R.id.frame_layout, fragment)
-//        transaction.commit()
-//    }
 }

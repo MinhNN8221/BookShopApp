@@ -8,7 +8,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/text_profile"
+        android:id="@+id/text_changePass"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/dp_30"
@@ -40,7 +40,7 @@
         android:text="@string/current"
         android:textSize="20dp"
         android:textColor="@color/primary"
-        app:layout_constraintEnd_toEndOf="@+id/text_profile"
+        app:layout_constraintEnd_toEndOf="@+id/text_changePass"
         app:layout_constraintStart_toStartOf="@+id/image_left"
         app:layout_constraintTop_toBottomOf="@+id/image_left" />
 
@@ -52,7 +52,7 @@
         android:textColor="@color/black"
         android:inputType="textPassword"
         android:layout_marginLeft="-4dp"
-        app:layout_constraintEnd_toEndOf="@+id/text_profile"
+        app:layout_constraintEnd_toEndOf="@+id/text_changePass"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/text_current_pass"
         app:layout_constraintTop_toBottomOf="@+id/text_current_pass" />

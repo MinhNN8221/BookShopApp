@@ -13,8 +13,16 @@ interface ProductRepository {
         page: Int,
         description_length: Int,
     ): Response<ProductsByAuthor>?
+
     suspend fun getProductsByCategory(
         author_id: Int,
+        limit: Int,
+        page: Int,
+        description_length: Int,
+    ): Response<ProductList>?
+
+    suspend fun getProductsBySupplier(
+        id: Int,
         limit: Int,
         page: Int,
         description_length: Int,

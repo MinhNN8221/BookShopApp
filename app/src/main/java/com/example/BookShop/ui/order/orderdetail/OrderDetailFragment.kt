@@ -11,13 +11,11 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.BookShop.R
 import com.example.BookShop.data.model.OrderDetail
 import com.example.BookShop.databinding.FragmentOrderDetailBinding
 import com.example.BookShop.ui.adapter.OrderDetailAdapter
 import com.example.BookShop.utils.FormatDate
 import com.example.BookShop.utils.FormatMoney
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class OrderDetailFragment : Fragment() {
 
@@ -49,16 +47,18 @@ class OrderDetailFragment : Fragment() {
         val orderId = arguments?.getString("orderId")?.toInt()
         val orderStatus = arguments?.getString("orderStatus")
         orderId?.let { orderId ->
-            viewModel.getOrderDetails(orderId)
-            viewModel.orderDetailList.observe(viewLifecycleOwner, Observer {
-                adapter.setData(it.products)
-                bindData(it, orderStatus.toString())
+            viewModel.orderDetailList.observe(viewLifecycleOwner, Observer {orderDetail->
+                adapter.setData(orderDetail.products)
+                bindData(orderDetail, orderStatus.toString())
             })
+            viewModel.getOrderDetails(orderId)
         }
-        binding?.recyclerOrderDetail?.layoutManager = LinearLayoutManager(context)
-        binding?.recyclerOrderDetail?.adapter = adapter
-        binding?.imageLeftOrder?.setOnClickListener {
-            parentFragmentManager.popBackStack()
+        binding?.apply {
+            recyclerOrderDetail.layoutManager = LinearLayoutManager(context)
+            recyclerOrderDetail.adapter = adapter
+            imageLeftOrder.setOnClickListener {
+                parentFragmentManager.popBackStack()
+            }
         }
     }
 

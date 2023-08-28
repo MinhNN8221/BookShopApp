@@ -29,15 +29,29 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_delete_cart"
+        android:text="@string/deleteCart"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/status"
+        android:textSize="14dp"
+        android:padding="5dp"
+        android:visibility="gone"
+        android:textStyle="italic"
+        app:layout_constraintTop_toBottomOf="@id/image_profile"
+        app:layout_constraintEnd_toEndOf="@id/image_profile"/>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:id="@+id/swipe_refresh"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@id/constraint"
         app:layout_constraintEnd_toEndOf="@id/image_profile"
         app:layout_constraintStart_toStartOf="@id/text_cart"
-        app:layout_constraintTop_toBottomOf="@id/text_cart">
+        app:layout_constraintTop_toBottomOf="@id/text_delete_cart">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_cartItem"
@@ -45,14 +59,29 @@
             android:layout_height="0dp" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <TextView
+        android:id="@+id/text_cart_infor"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:text="Bạn chưa thêm sản phẩm nào vào giỏ hàng."
+        android:textColor="@color/black"
+        android:textSize="25dp"
+        android:textStyle="italic"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/image_profile"
+        app:layout_constraintStart_toStartOf="@id/text_cart"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="25dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -81,7 +110,7 @@
             app:layout_constraintTop_toBottomOf="@id/text_total" />
 
         <TextView
-            android:id="@+id/text_add_to_bag"
+            android:id="@+id/text_check_out"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_btn_checkout"

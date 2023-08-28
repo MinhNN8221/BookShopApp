@@ -4,9 +4,10 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "https://ec4b-116-97-243-66.ngrok-free.app/"
+    private const val BASE_URL = "https://5b2d-116-104-87-246.ngrok-free.app"
     private var accessToken=""
 
     fun updateAccessToken(token: String) {
@@ -22,6 +23,10 @@ object RetrofitClient {
                 .build()
             chain.proceed(request)
         })
+            .connectTimeout(30, TimeUnit.SECONDS) // Đặt thời gian kết nối tối đa
+            .readTimeout(30, TimeUnit.SECONDS)    // Đặt thời gian đọc dữ liệu tối đa
+            .writeTimeout(30, TimeUnit.SECONDS)   // Đặt thời gian ghi dữ liệu tối đa
+            .build()
 
         val client = httpClient.build()
         Retrofit.Builder()

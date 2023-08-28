@@ -54,7 +54,7 @@ class ForgotPasswordFragment : Fragment() {
     }
 
     private fun inintViewModel() {
-        viewModel.messeage.observe(viewLifecycleOwner) { message ->
+        viewModel.message.observe(viewLifecycleOwner) { message ->
             loadingProgressBar.cancel()
             message?.let { message ->
                 AlertMessageViewer.showAlertDialogMessage(requireContext(), message.message)

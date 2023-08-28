@@ -54,7 +54,6 @@ class ProductdetailFragment : Fragment() {
         productId?.let {
             viewModel.getProductInfo(it)
         }
-
         readmoreInfo()
         activity?.let { MySharedPreferences.init(it.applicationContext) }
         binding?.apply {
@@ -80,7 +79,7 @@ class ProductdetailFragment : Fragment() {
             textAdditemtocart.setOnClickListener {
                 productId?.let { productId ->
                     viewModel.addItemToCart(productId)
-                    Toast.makeText(context, "ADD ITEM TO CART SUCCESSFUL", Toast.LENGTH_SHORT)
+                    Toast.makeText(context, "Add item to cart successful", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
@@ -137,14 +136,13 @@ class ProductdetailFragment : Fragment() {
                 .into(imagePro)
             textName.text = productInfoList.product.name
             textMa.text =
-                textMa.text.toString() + " " + productInfoList.product.productId
+                resources.getString(R.string.productId) + " " + productInfoList.product.productId
             textDescription.text = productInfoList.product.description
             textPrice.text =
                 formatMoney.formatMoney(productInfoList.product.price.toDouble().toLong())
-            textNameAuthor.text =
-                textNameAuthor.text.toString() + " " + setAuthorName(productInfoList.author.authorName)
+            textNameAuthor.text = " " + setAuthorName(productInfoList.author.authorName)
             textNcc.text =
-                textNcc.text.toString() + " " + productInfoList.supplier.supplier_name
+                resources.getString(R.string.supplier) + " " + productInfoList.supplier.supplier_name
             readmore.text = resources.getString(R.string.readmore)
             textPublish.text = productInfoList.supplier.supplier_name
             val wishListPre = MySharedPreferences.getInt("wishlist", -1)

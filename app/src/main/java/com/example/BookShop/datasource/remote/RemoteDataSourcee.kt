@@ -1,11 +1,9 @@
 package com.example.BookShop.datasource.remote
 
-import android.util.Log
 import com.example.BookShop.data.api.RetrofitClient
 import com.example.BookShop.data.model.*
 import com.example.BookShop.datasource.IDataSource
 import okhttp3.MultipartBody
-import retrofit2.Call
 import retrofit2.Response
 
 class RemoteDataSource() : IDataSource {
@@ -14,7 +12,7 @@ class RemoteDataSource() : IDataSource {
         return RetrofitClient.apiService.login(email, password)
     }
 
-    override suspend fun forgotPassword(email: String): Response<Messeage> {
+    override suspend fun forgotPassword(email: String): Response<Message> {
         return RetrofitClient.apiService.fotgotPass(email)
     }
 
@@ -80,6 +78,22 @@ class RemoteDataSource() : IDataSource {
         )
     }
 
+    override suspend fun getSearchSupplierProducts(
+        supplierId: Int,
+        limit: Int,
+        page: Int,
+        description_length: Int,
+        query_string: String,
+    ): Response<ProductList>? {
+        return RetrofitClient.apiService.getSearchSupplierProducts(
+            supplierId,
+            limit,
+            page,
+            description_length,
+            query_string
+        )
+    }
+
     override suspend fun getProductInfo(id: Int): Response<ProductInfoList>? {
         return RetrofitClient.apiService.getProductInfo(id)
     }
@@ -100,6 +114,15 @@ class RemoteDataSource() : IDataSource {
         description_length: Int,
     ): Response<ProductList> {
         return RetrofitClient.apiService.getProductsByCategory(id, limit, page, description_length)
+    }
+
+    override suspend fun getProductsBySupplier(
+        id: Int,
+        limit: Int,
+        page: Int,
+        description_length: Int,
+    ): Response<ProductList>? {
+        return RetrofitClient.apiService.getProductsBySupplier(id, limit, page, description_length)
     }
 
     override suspend fun getAuthor(authorId: Int): Response<AuthorResult>? {
@@ -152,11 +175,30 @@ class RemoteDataSource() : IDataSource {
         return RetrofitClient.apiService.addProduct2Cart(productId)
     }
 
-    override suspend fun addItemToWishList(productId: Int): Response<Messeage>? {
+    override suspend fun addAllItemToCart(): Response<Message> {
+        return RetrofitClient.apiService.addAllItem2Cart()
+    }
+
+    override suspend fun deleteAllItemCart(): Response<Message> {
+        return RetrofitClient.apiService.deleteAllItemCart()
+    }
+
+    override suspend fun changeProductQuantityInCart(
+        itemId: Int,
+        quantity: Int,
+    ): Response<Message>? {
+        return RetrofitClient.apiService.changeProductQuantityInCart(itemId, quantity)
+    }
+
+    override suspend fun removeItemInCart(itemId: Int): Response<Message>? {
+        return RetrofitClient.apiService.removeItemInCart(itemId)
+    }
+
+    override suspend fun addItemToWishList(productId: Int): Response<Message>? {
         return RetrofitClient.apiService.addItemToWishList(productId)
     }
 
-    override suspend fun removeItemInWishList(productId: Int): Response<Messeage> {
+    override suspend fun removeItemInWishList(productId: Int): Response<Message> {
         return RetrofitClient.apiService.removeItemInWishList(productId)
     }
 
@@ -174,5 +216,17 @@ class RemoteDataSource() : IDataSource {
 
     override suspend fun getCategory(): Response<CategoryList>? {
         return RetrofitClient.apiService.getCategory()
+    }
+
+    override suspend fun createOrder(
+        cartId: String,
+        shippingId: Int,
+        address: String,
+        receiverName: String,
+        receiverPhone: String,
+    ): Response<Message> {
+        return RetrofitClient.apiService.createOrder(
+            cartId, shippingId, address, receiverName, receiverPhone
+        )
     }
 }

@@ -1,10 +1,15 @@
 package com.example.BookShop.ui.profile.profilesignin
 
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.addCallback
+import androidx.fragment.app.FragmentManager
 import com.example.BookShop.R
 import com.example.BookShop.databinding.FragmentProfileSigninBinding
 import com.example.BookShop.ui.auth.signin.SignInFragment
@@ -13,6 +18,7 @@ import com.example.BookShop.ui.auth.signup.SignUpFragment
 class ProfileSignInFragment : Fragment() {
 
     private var binding: FragmentProfileSigninBinding? = null
+    private var doubleBackToExitPressedOnce = false
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -23,6 +29,14 @@ class ProfileSignInFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var backStackEntryCount = parentFragmentManager.backStackEntryCount
+
+        for (i in 0 until backStackEntryCount) {
+            val entry = parentFragmentManager.getBackStackEntryAt(i)
+            val fragmentTag = entry.name // Lấy tag của Fragment
+            Log.d("BackStack", "Fragment at index $i: $fragmentTag")
+        }
+
         binding?.apply {
             textBtnSignin.setOnClickListener {
                 parentFragmentManager.beginTransaction()
@@ -33,6 +47,18 @@ class ProfileSignInFragment : Fragment() {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, SignUpFragment())
                     .commit()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (doubleBackToExitPressedOnce) {
+                requireActivity().finish()
+            } else {
+                doubleBackToExitPressedOnce = true
+                Toast.makeText(requireContext(), "Nhấn back lần nữa để thoát", Toast.LENGTH_SHORT)
+                    .show()
+                Handler().postDelayed({
+                    doubleBackToExitPressedOnce = false
+                }, 2500)
             }
         }
     }

@@ -40,14 +40,28 @@ class OrderHistoryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(OrderHistoryViewModel::class.java)
+        viewModel = ViewModelProvider(this)[OrderHistoryViewModel::class.java]
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         adapter = OrderHistoryAdapter()
-        binding?.loadingLayout?.root?.visibility = View.VISIBLE
+        initViewModel()
+        navToOrderDetail()
+        binding?.apply {
+            loadingLayout.root.visibility = View.VISIBLE
+            viewModel.getOrderHistory()
+            recyclerOrderHistory.layoutManager = LinearLayoutManager(context)
+            recyclerOrderHistory.adapter = adapter
+            imageLeftOrder.setOnClickListener {
+                parentFragmentManager.popBackStack()
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun initViewModel() {
         val list = mutableListOf<OrderHistory>()
         val currentDate = formatDate.formatDate(LocalDateTime.now().toString())
         val mapOrder: MutableMap<String, MutableList<Order>> = mutableMapOf()
@@ -73,18 +87,9 @@ class OrderHistoryFragment : Fragment() {
                     binding?.textOrderHistory?.visibility = View.VISIBLE
                 }
                 adapter.setData(list)
-                navToOrderDetail()
                 binding?.loadingLayout?.root?.visibility = View.INVISIBLE
             }
         })
-        viewModel.getOrderHistory()
-        binding?.recyclerOrderHistory?.layoutManager = LinearLayoutManager(context)
-        binding?.recyclerOrderHistory?.adapter = adapter
-        binding?.apply {
-            imageLeftOrder.setOnClickListener {
-                parentFragmentManager.popBackStack()
-            }
-        }
     }
 
     private fun navToOrderDetail() {
@@ -100,7 +105,6 @@ class OrderHistoryFragment : Fragment() {
                     .addToBackStack("Orderhistory")
                     .commit()
             }
-
         })
     }
 }

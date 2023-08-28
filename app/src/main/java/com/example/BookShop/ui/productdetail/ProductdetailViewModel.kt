@@ -18,10 +18,10 @@ class ProductdetailViewModel : ViewModel() {
     // TODO: Implement the ViewModel
     private val _productListInfo = MutableLiveData<ProductInfoList?>()
     val productInfo: LiveData<ProductInfoList?> get() = _productListInfo
-    private val _messageAdd = MutableLiveData<Messeage>()
-    val messeageAdd: LiveData<Messeage> get() = _messageAdd
-    private val _messageRemove = MutableLiveData<Messeage>()
-    val messeageRemove: LiveData<Messeage> get() = _messageRemove
+    private val _messageAdd = MutableLiveData<Message>()
+    val messageAdd: LiveData<Message> get() = _messageAdd
+    private val _messageRemove = MutableLiveData<Message>()
+    val messageRemove: LiveData<Message> get() = _messageRemove
 
     private var productRepository: ProductRepository? = ProductRepositoryImp(RemoteDataSource())
     private var cartRepository: CartRepositoryImp? = CartRepositoryImp(RemoteDataSource())

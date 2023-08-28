@@ -132,18 +132,12 @@
         app:layout_constraintEnd_toEndOf="@+id/text_order_date"
         app:layout_constraintStart_toEndOf="@+id/text_status" />
 
-    <!--    <androidx.constraintlayout.widget.Group-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:id="@+id/groudp_detail"-->
-    <!--        app:layout_constraintBottom_toTopOf="@id/text_total"-->
-    <!--        app:constraint_referenced_ids="text_order_date,text_order_address,text_order_sum, text_status, text_order_status"/>-->
     <TextView
         android:id="@+id/text_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:layout_marginBottom="63dp"
+        android:layout_marginBottom="30dp"
         android:text="@string/textTotal"
         android:textColor="@color/black"
         android:textSize="18dp"
@@ -156,9 +150,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:layout_marginBottom="63dp"
-        android:textColor="@color/red"
+        android:layout_marginBottom="30dp"
         android:text="0VND"
+        android:textColor="@color/red"
         android:textSize="18dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

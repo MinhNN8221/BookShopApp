@@ -5,22 +5,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.text.isDigitsOnly
 
 object AlertMessageViewer {
-
-    fun showAlertDialogMessage(context: Context, message: String){
-
-        var newMessage = message
-        if(message.isDigitsOnly()){
-            newMessage = context.getString(message.toInt())
-        }
-
+    fun showAlertDialogMessage(context: Context, message: String) {
         AlertDialog.Builder(context)
-            .setMessage(newMessage)
+            .setTitle(null)
+            .setMessage(message)
             .setCancelable(false)
             .setPositiveButton("Close") { dialog, _ ->
                 dialog.cancel()
             }
             .show()
-
     }
-
 }

@@ -2,8 +2,6 @@ package com.example.BookShop.ui.main.search
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -28,19 +26,17 @@ import com.example.BookShop.data.model.HistorySearch
 import com.example.BookShop.data.model.Product
 import com.example.BookShop.databinding.FragmentSearchBinding
 import com.example.BookShop.datasource.local.db.entity.ProductDb
-import com.example.BookShop.ui.adapter.BookAdapter
+import com.example.BookShop.ui.adapter.ProductAdapter
 import com.example.BookShop.ui.adapter.HistorySeachAdapter
 import com.example.BookShop.ui.adapter.OnItemClickListener
 import com.example.BookShop.ui.productdetail.ProductdetailFragment
 import com.example.BookShop.utils.ItemSpacingDecoration
 import com.example.BookShop.utils.MySharedPreferences
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlin.math.min
 
 class SearchFragment : Fragment() {
     private var binding: FragmentSearchBinding? = null
     private lateinit var viewModel: SearchViewModel
-    private lateinit var adapter: BookAdapter
+    private lateinit var adapter: ProductAdapter
     private lateinit var adapterHistory: HistorySeachAdapter
     private var bookList = mutableListOf<Product>()
     private var list = mutableListOf<HistorySearch>()
@@ -75,7 +71,7 @@ class SearchFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = BookAdapter()
+        adapter = ProductAdapter()
         adapterHistory = HistorySeachAdapter()
         adapter.clearData()
         initViewModel()
@@ -94,6 +90,77 @@ class SearchFragment : Fragment() {
         }
         val horizontalSpacing = resources.getDimensionPixelSize(R.dimen.horizontal_spacing)
         val verticalSpacing = resources.getDimensionPixelSize(R.dimen.vertical_spacing)
+        handleSearch()
+        handleSearchLocal()
+        searchByQuery()
+        searchByNew()
+        searchBySelling()
+        searchByPrice()
+        refreshData()
+        binding?.apply {
+            recyclerHistorySearch.layoutManager = LinearLayoutManager(context)
+            recyclerHistorySearch.adapter = adapterHistory
+            layoutManager = GridLayoutManager(context, 2)
+            recyclerProduct.layoutManager = layoutManager
+            recyclerProduct.adapter = adapter
+            recyclerProduct.addItemDecoration(
+                ItemSpacingDecoration(
+                    horizontalSpacing, verticalSpacing
+                )
+            )
+            layoutSearch.setOnTouchListener { view, motionEvent ->
+                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    val event =
+                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    event.hideSoftInputFromWindow(requireView().windowToken, 0)
+                }
+                false
+            }
+            floatButton.setOnClickListener {
+                recyclerProduct.scrollToPosition(0)
+                floatButton.visibility = View.INVISIBLE
+            }
+        }
+        handleLoadData()
+    }
+    private fun initViewModel() {
+        viewModel.productList.observe(viewLifecycleOwner) { productList ->
+            if (pastPage != currentPage) {
+                if (currentPage > 1) {
+                    bookList.addAll(productList)
+                } else {
+                    bookList.clear()
+                    bookList.addAll(productList)
+                }
+            }
+            adapter.setData(bookList)
+            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
+            addItemToCart()
+            navToProductDetail()
+        }
+        viewModel.historyList.observe(viewLifecycleOwner) {
+            list.clear()
+            for (historyLocal in it.reversed()) {
+                list.add(HistorySearch(historyLocal, null))
+            }
+            if (list.size > 0) {
+                binding?.textRemoveAll?.visibility = View.VISIBLE
+            }
+            adapterHistory.setData(list)
+            searchLocalProduct()
+            clickRemoveHistory()
+        }
+        viewModel.productNameList.observe(viewLifecycleOwner) {
+            list.clear()
+            for (product in it) {
+                list.add(HistorySearch(null, product))
+            }
+            adapterHistory.setData(list)
+            binding?.textRemoveAll?.visibility = View.INVISIBLE
+            searchSuggestProduct()
+        }
+    }
+    private fun handleSearch() {
         binding?.apply {
             editSearch.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus) {
@@ -134,6 +201,36 @@ class SearchFragment : Fragment() {
                     }
                 }
             })
+        }
+    }
+
+    private fun searchByQuery() {
+        binding?.apply {
+            imageSeach.setOnClickListener {
+                queryString = editSearch.text.toString()
+                if (!queryString.isEmpty()) {
+                    viewModel.insertHistorySearchLocal(
+                        ProductDb(
+                            idCustomer = idCustomer,
+                            productName = queryString
+                        )
+                    )
+                }
+                currentPage = 1
+                pastPage = -1
+                viewModel.getSearchProducts(10, 1, 100, queryString, filterType, priceSort)
+                val inputMethodManager =
+                    requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(editSearch.windowToken, 0)
+                editSearch.clearFocus()
+                groupHistorySearch.visibility = View.INVISIBLE
+                groupSearch.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun handleSearchLocal() {
+        binding?.apply {
             editSearch.setOnEditorActionListener { textView, actionId, keyEvent ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     queryString = editSearch.text.toString()
@@ -165,35 +262,20 @@ class SearchFragment : Fragment() {
                 }
                 return@setOnEditorActionListener false
             }
-            imageSeach.setOnClickListener {
-                queryString = editSearch.text.toString()
-                if (!queryString.isEmpty()) {
-                    viewModel.insertHistorySearchLocal(
-                        ProductDb(
-                            idCustomer = idCustomer,
-                            productName = queryString
-                        )
-                    )
-                }
-                currentPage = 1
-                pastPage = -1
-                viewModel.getSearchProducts(10, 1, 100, queryString, filterType, priceSort)
-                val inputMethodManager =
-                    requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(editSearch.windowToken, 0)
-                editSearch.clearFocus()
-                groupHistorySearch.visibility = View.INVISIBLE
-                groupSearch.visibility = View.VISIBLE
-            }
             textRemoveAll.setOnClickListener {
                 viewModel.deleteHistorySearchLocal()
                 list.clear()
                 adapterHistory.clearData()
                 textRemoveAll.visibility = View.INVISIBLE
             }
+        }
+    }
+
+    private fun searchByNew() {
+        binding?.apply {
             textProductNew.setOnClickListener {
                 adapter.clearData()
-                binding?.loadingLayout?.root?.visibility = View.VISIBLE
+                loadingLayout.root.visibility = View.VISIBLE
                 currentPage = 1
                 pastPage = -1
                 filterType = 1
@@ -204,9 +286,14 @@ class SearchFragment : Fragment() {
                 setTextColor(textProductNew, "blue")
                 setTextColor(textProdcutSelling, "black")
             }
+        }
+    }
+
+    private fun searchBySelling() {
+        binding?.apply {
             textProdcutSelling.setOnClickListener {
                 adapter.clearData()
-                binding?.loadingLayout?.root?.visibility = View.VISIBLE
+                loadingLayout.root.visibility = View.VISIBLE
                 currentPage = 1
                 pastPage = -1
                 filterType = 2
@@ -215,9 +302,14 @@ class SearchFragment : Fragment() {
                 setTextColor(textProductNew, "black")
                 setTextColor(textProdcutSelling, "blue")
             }
+        }
+    }
+
+    private fun searchByPrice() {
+        binding?.apply {
             linearProductPrice.setOnClickListener {
                 adapter.clearData()
-                binding?.loadingLayout?.root?.visibility = View.VISIBLE
+                loadingLayout.root.visibility = View.VISIBLE
                 currentPage = 1
                 pastPage = -1
                 filterType = 3
@@ -230,50 +322,22 @@ class SearchFragment : Fragment() {
                     checkAsc = true
                     imagePriceSort.setImageResource(R.drawable.ic_discre)
                 }
-                viewModel.getSearchProducts(10, currentPage, 100, queryString, filterType, priceSort)
+                viewModel.getSearchProducts(
+                    10,
+                    currentPage,
+                    100,
+                    queryString,
+                    filterType,
+                    priceSort
+                )
                 setTextColor(textProductPriceSort, "blue")
                 setTextColor(textProductNew, "black")
                 setTextColor(textProdcutSelling, "black")
             }
-            recyclerHistorySearch.layoutManager = LinearLayoutManager(context)
-            recyclerHistorySearch.adapter = adapterHistory
-            layoutManager = GridLayoutManager(context, 2)
-            recyclerProduct.layoutManager = layoutManager
-            recyclerProduct.adapter = adapter
-            recyclerProduct.addItemDecoration(
-                ItemSpacingDecoration(
-                    horizontalSpacing, verticalSpacing
-                )
-            )
-            layoutSearch.setOnTouchListener { view, motionEvent ->
-                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-                    val event =
-                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    event.hideSoftInputFromWindow(requireView().windowToken, 0)
-                }
-                false
-            }
-            floatButton.setOnClickListener {
-                recyclerProduct.scrollToPosition(0)
-                floatButton.visibility = View.INVISIBLE
-            }
-            swipeRefresh.setOnRefreshListener {
-                Handler().postDelayed(
-                    {
-                        swipeRefresh.isRefreshing=false
-                        viewModel.getSearchProducts(
-                            10,
-                            1,
-                            100,
-                            queryString,
-                            filterType,
-                            "asc"
-                        )
-                    }, 1000
-                )
-            }
-            swipeRefresh.setColorSchemeColors(resources.getColor(R.color.teal_200))
         }
+    }
+
+    private fun handleLoadData() {
         binding?.apply {
             recyclerProduct.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -286,7 +350,7 @@ class SearchFragment : Fragment() {
                     } else {
                         floatButton.visibility = View.INVISIBLE
                     }
-                    if (currentPage != lastPosition && lastPosition == totalPosition - 3) {
+                    if (currentPosition != lastPosition && lastPosition == totalPosition - 3) {
                         currentPage++
                         viewModel.getSearchProducts(
                             10,
@@ -301,44 +365,26 @@ class SearchFragment : Fragment() {
                 }
             })
         }
-
     }
 
-    private fun initViewModel() {
-        viewModel.productList.observe(viewLifecycleOwner) { productList ->
-            if (pastPage != currentPage) {
-                if (currentPage > 1) {
-                    bookList.addAll(productList)
-                } else {
-                    bookList.clear()
-                    bookList.addAll(productList)
-                }
+    private fun refreshData(){
+        binding?.apply {
+            swipeRefresh.setOnRefreshListener {
+                Handler().postDelayed(
+                    {
+                        swipeRefresh.isRefreshing = false
+                        viewModel.getSearchProducts(
+                            10,
+                            1,
+                            100,
+                            queryString,
+                            filterType,
+                            "asc"
+                        )
+                    }, 1000
+                )
             }
-            adapter.setData(bookList)
-            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
-            addItemToCart()
-            navToProductDetail()
-        }
-        viewModel.historyList.observe(viewLifecycleOwner) {
-            list.clear()
-            for (historyLocal in it.reversed()) {
-                list.add(HistorySearch(historyLocal, null))
-            }
-            if (list.size > 0) {
-                binding?.textRemoveAll?.visibility = View.VISIBLE
-            }
-            adapterHistory.setData(list)
-            searchLocalProduct()
-            clickRemoveHistory()
-        }
-        viewModel.productNameList.observe(viewLifecycleOwner) {
-            list.clear()
-            for (product in it) {
-                list.add(HistorySearch(null, product))
-            }
-            adapterHistory.setData(list)
-            binding?.textRemoveAll?.visibility = View.INVISIBLE
-            searchSuggestProduct()
+            swipeRefresh.setColorSchemeColors(resources.getColor(R.color.teal_200))
         }
     }
 
@@ -348,7 +394,7 @@ class SearchFragment : Fragment() {
                 val product = adapter.getBook(position)
                 viewModel.addItemToCart(product.product_id)
                 Toast.makeText(
-                    context, "ADD ITEM TO CART SUCCESSFUL", Toast.LENGTH_SHORT
+                    context, "Add item to cart successful", Toast.LENGTH_SHORT
                 ).show()
             }
         })
@@ -415,7 +461,7 @@ class SearchFragment : Fragment() {
 
     private fun clickRemoveHistory() {
         adapterHistory.clickRemoveItem(object : OnItemClickListener {
-            @SuppressLint("NotifyDataSetChanged")
+            @SuppressLint("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcl9pZCI6MiwibmFtZSI6IlR14bqlbiBBbmhhaGFiYmEiLCJlbWFpbCI6ImFuaGR0MUB5b3BtYWlsLmNvbSIsImlhdCI6MTY5MTE0MDQ0NCwiZXhwIjoxNjkyNDM2NDQ0fQ.-WZqzjEzfWgsdwK6KZXy79rJJkYd6ao1z1lNAJK_qzU")
             override fun onItemClick(position: Int) {
                 val productName = adapterHistory.getProductNameLocal(position)
                 productName?.let { viewModel.removeItemHistorySearchLocal(it) }

@@ -31,6 +31,7 @@ class SearchViewModel(application: Application) : ViewModel() {
     private var cartRepository: CartRepository? = CartRepositoryImp(RemoteDataSource())
     private val historySearchRepository: HistorySearchRepository =
         HistorySearchRepositoryImp(application)
+    var job: Job? = null
 
     fun getSearchProducts(
         limit: Int,
@@ -73,7 +74,6 @@ class SearchViewModel(application: Application) : ViewModel() {
         }
     }
 
-    var job: Job? = null
     fun getHistorySearchLocal(idCustomer: Int) {
         job?.cancel()
         job = viewModelScope.launch(Dispatchers.IO) {

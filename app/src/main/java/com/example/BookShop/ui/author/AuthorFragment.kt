@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.BookShop.R
 import com.example.BookShop.data.model.Product
-import com.example.BookShop.ui.adapter.BookAdapter
+import com.example.BookShop.ui.adapter.ProductAdapter
 import com.example.BookShop.databinding.FragmentAuthorBinding
 import com.example.BookShop.ui.adapter.OnItemClickListener
 import com.example.BookShop.ui.productdetail.ProductdetailFragment
@@ -38,7 +38,7 @@ class AuthorFragment : Fragment() {
 
     private lateinit var viewModel: AuthorViewModel
     private var binding: FragmentAuthorBinding? = null
-    private lateinit var adapter: BookAdapter
+    private lateinit var adapter: ProductAdapter
     private var bookList = mutableListOf<Product>()
     private var currentPage = 1
     private var lastPosition = 0
@@ -56,13 +56,13 @@ class AuthorFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(AuthorViewModel::class.java)
+        viewModel = ViewModelProvider(this)[AuthorViewModel::class.java]
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = BookAdapter()
+        adapter = ProductAdapter()
         binding?.loadingLayout?.root?.visibility = View.VISIBLE
         initViewModel()
         navToProductDetail()
@@ -76,6 +76,66 @@ class AuthorFragment : Fragment() {
             resources.getDimensionPixelSize(R.dimen.horizontal_spacing)
         val verticalSpacing =
             resources.getDimensionPixelSize(R.dimen.vertical_spacing)
+        authorId?.let { handleSearch(it) }
+        binding?.apply {
+            recyclerAuthor.addItemDecoration(
+                ItemSpacingDecoration(
+                    horizontalSpacing,
+                    verticalSpacing
+                )
+            )
+            recyclerAuthor.layoutManager = GridLayoutManager(context, 2)
+            recyclerAuthor.adapter = adapter
+            imageLeft.setOnClickListener {
+                parentFragmentManager.popBackStack()
+            }
+            layoutAuthor.setOnTouchListener { view, motionEvent ->
+                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    val event =
+                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    event.hideSoftInputFromWindow(requireView().windowToken, 0)
+                }
+                false
+            }
+            swipeRefresh.setOnRefreshListener {
+                Handler().postDelayed({
+                    swipeRefresh.isRefreshing = false
+                    authorId?.let {
+                        viewModel.getAuthor(it)
+                        viewModel.getProductsByAuthor(it, 10, currentPage, 100)
+                    }
+                }, 1000)
+            }
+        }
+        authorId?.let { handleLoadData(it) }
+    }
+
+
+    private fun initViewModel() {
+        viewModel.productList.observe(viewLifecycleOwner) { productList ->
+            if (pastPage != currentPage) {
+                if (currentPage > 1) {
+                    bookList.addAll(productList)
+                } else {
+                    bookList.clear()
+                    bookList.addAll(productList)
+                }
+            }
+            adapter.setData(bookList)
+            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
+        }
+        viewModel.author.observe(viewLifecycleOwner) {
+            if (it != null) {
+                if (!it.author.authorDescription.contains(it.author.authorName))
+                    it.author.authorDescription =
+                        it.author.authorName + " " + it.author.authorDescription
+                binding?.textAuthor?.text =
+                    setAuthorName(it.author.authorDescription, it.author.authorName)
+            }
+        }
+    }
+
+    private fun handleSearch(authorId: Int) {
         binding?.apply {
             searchProduct.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
@@ -88,7 +148,7 @@ class AuthorFragment : Fragment() {
                         textAuthor.visibility = View.VISIBLE
                         textHot.visibility = View.VISIBLE
                         currentPage = 1
-                        if (authorId != null) {
+                        authorId.let { authorId ->
                             viewModel.getProductsByAuthor(authorId, 10, 1, 100)
                         }
                         loadingLayout.root.visibility = View.VISIBLE
@@ -108,7 +168,7 @@ class AuthorFragment : Fragment() {
                         val delayMillis = 300L
                         searchHandler.removeCallbacksAndMessages(null)
                         searchHandler.postDelayed({
-                            authorId?.let {
+                            authorId.let {
                                 viewModel.getSearchAuthorProduct(it, 1, newText)
                             }
                         }, delayMillis)
@@ -116,35 +176,10 @@ class AuthorFragment : Fragment() {
                     return false;
                 }
             })
-            recyclerAuthor.addItemDecoration(
-                ItemSpacingDecoration(
-                    horizontalSpacing,
-                    verticalSpacing
-                )
-            )
-            recyclerAuthor.layoutManager = GridLayoutManager(context, 2)
-            recyclerAuthor.adapter = adapter
-            imageLeft.setOnClickListener {
-                parentFragmentManager.popBackStack()
-            }
-            imageLeft.setOnClickListener {
-                parentFragmentManager.popBackStack()
-            }
-            layoutAuthor.setOnTouchListener { view, motionEvent ->
-                if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-                    val event =
-                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    event.hideSoftInputFromWindow(requireView().windowToken, 0)
-                }
-                false
-            }
-            swipeRefresh.setOnRefreshListener {
-                Handler().postDelayed({
-                    swipeRefresh.isRefreshing = false
-                    authorId?.let { viewModel.getAuthor(it) }
-                }, 1000)
-            }
         }
+    }
+
+    private fun handleLoadData(authorId: Int) {
         binding?.apply {
             recyclerAuthor.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -154,42 +189,13 @@ class AuthorFragment : Fragment() {
                     totalPosition = adapter.itemCount
                     if (lastPosition != currentPosition && ((lastPosition == totalPosition - 3 && totalPosition % 2 == 0) || (lastPosition == totalPosition - 2 && totalPosition % 2 != 0))) {
                         currentPage++
-                        if (authorId != null) {
+                        authorId.let { authorId ->
                             viewModel.getProductsByAuthor(authorId, 10, currentPage, 100)
                         }
                         currentPosition = lastPosition
                     }
                 }
             })
-        }
-    }
-
-    private fun initViewModel() {
-        viewModel.productList.observe(viewLifecycleOwner) { state ->
-            val isDefaultState = state.isDefaultState
-            state.products?.let {
-                if (pastPage != currentPage && isDefaultState) {
-                    if (currentPage > 1) {
-                        bookList.addAll(it)
-                    } else {
-                        bookList.clear()
-                        bookList.addAll(it)
-                    }
-                } else if (!isDefaultState) {
-                    bookList = it as MutableList<Product>
-                }
-                adapter.setData(bookList)
-                binding?.loadingLayout?.root?.visibility = View.INVISIBLE
-            }
-        }
-        viewModel.author.observe(viewLifecycleOwner) {
-            if (it != null) {
-                if (!it.author.authorDescription.contains(it.author.authorName))
-                    it.author.authorDescription =
-                        it.author.authorName + " " + it.author.authorDescription
-                binding?.textAuthor?.text =
-                    setAuthorName(it.author.authorDescription, it.author.authorName)
-            }
         }
     }
 
@@ -214,7 +220,7 @@ class AuthorFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 val product = adapter.getBook(position)
                 viewModel.addItemToCart(product.product_id)
-                Toast.makeText(context, "ADD ITEM TO CART SUCCESSFUL", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Add item to cart successful", Toast.LENGTH_SHORT).show()
             }
         })
     }

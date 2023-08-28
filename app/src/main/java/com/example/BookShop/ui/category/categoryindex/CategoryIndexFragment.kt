@@ -75,7 +75,6 @@ class CategoryIndexFragment : Fragment() {
                     .addToBackStack("CategoryIndex")
                     .commit()
             }
-
         })
     }
 }

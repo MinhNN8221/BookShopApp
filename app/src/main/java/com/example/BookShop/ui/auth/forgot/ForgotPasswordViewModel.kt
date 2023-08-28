@@ -15,21 +15,21 @@ import kotlinx.coroutines.launch
 
 class ForgotPasswordViewModel : ViewModel() {
     // TODO: Implement the ViewModel
-    private var _message = MutableLiveData<Messeage>()
-    val messeage: LiveData<Messeage> get() = _message
+    private var _message = MutableLiveData<Message>()
+    val message: LiveData<Message> get() = _message
     private var authRepository: AuthRepository = AuthRepositoryImp(RemoteDataSource())
 
     fun checkFields(user: AuthResponse) {
         if (user.isForgotPassFieldEmpty()) {
-            _message.postValue(Messeage("Fields cannot be empty!"))
+            _message.postValue(Message("Fields cannot be empty!"))
             return
         }
 
         if (!user.isValidEmail()) {
-            _message.postValue(Messeage("Please enter a valid email address!"))
+            _message.postValue(Message("Please enter a valid email address!"))
             return
         }
-        forgotPassword(user.customer.email.toString())
+        forgotPassword(user.customer.email)
     }
     fun forgotPassword(email: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -40,7 +40,7 @@ class ForgotPasswordViewModel : ViewModel() {
                 val errorBody = response?.errorBody()?.string()
                 val gson = Gson()
                 val errorResponse = gson.fromJson(errorBody, ErrorResponse::class.java)
-                _message.postValue(Messeage(message = errorResponse.error.message))
+                _message.postValue(Message(message = errorResponse.error.message))
                 Log.d("ForgotPassNull", "NULL")
             }
         }

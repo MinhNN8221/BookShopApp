@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.os.Handler
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import androidx.fragment.app.Fragment
@@ -13,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.addCallback
 import com.example.BookShop.R
 import com.example.BookShop.data.api.RetrofitClient
 import com.example.BookShop.data.model.Customer
@@ -35,6 +37,7 @@ class SignInFragment : Fragment() {
     private var binding: FragmentSignInBinding? = null
     private var checkVisible = false
     private lateinit var loadingProgressBar: LoadingProgressBar
+    private var doubleBackToExitPressedOnce = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[SignInViewModel::class.java]
@@ -104,6 +107,18 @@ class SignInFragment : Fragment() {
                 }
             }
         }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (doubleBackToExitPressedOnce) {
+                requireActivity().finish()
+            } else {
+                doubleBackToExitPressedOnce = true
+                Toast.makeText(requireContext(), "Nhấn back lần nữa để thoát", Toast.LENGTH_SHORT)
+                    .show()
+                Handler().postDelayed({
+                    doubleBackToExitPressedOnce = false
+                }, 2500)
+            }
+        }
     }
 
     fun initViewModel() {
@@ -131,11 +146,7 @@ class SignInFragment : Fragment() {
     }
 
     fun navToMainScreen() {
-        val fragment = MainMenuFragment()
-        val fragmentManager = requireActivity().supportFragmentManager
-        val transaction = fragmentManager.beginTransaction()
-        transaction.replace(R.id.container, fragment)
-        transaction.addToBackStack("SignInFragment")
-        transaction.commit()
+        parentFragmentManager.beginTransaction().replace(R.id.container, MainMenuFragment())
+            .commit()
     }
 }

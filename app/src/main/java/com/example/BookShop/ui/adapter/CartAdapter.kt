@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.BookShop.R
-import com.example.BookShop.data.model.Cart
 import com.example.BookShop.data.model.CartItem
 import com.example.BookShop.databinding.ItemCartBinding
 import com.example.BookShop.utils.FormatMoney
@@ -19,6 +18,8 @@ import com.example.BookShop.utils.FormatMoney
 class CartAdapter() : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
     private var formatMoney = FormatMoney()
     private var cartItemList: MutableList<CartItem> = mutableListOf()
+    private var onIncreClickListener: OnItemClickListener? = null
+    private var onDecreClickListener: OnItemClickListener? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartAdapter.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemCartBinding.inflate(inflater, parent, false)
@@ -34,6 +35,28 @@ class CartAdapter() : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
         return cartItemList.size
     }
 
+    fun getItemCart(position: Int): CartItem {
+        return cartItemList[position]
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setProductQuantity(quantity: Int, position: Int) {
+        cartItemList[position].quantity = quantity
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setSubTotalPrice(subTotalPrice: Double, position: Int) {
+        cartItemList[position].subTotal = subTotalPrice.toString()
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun removeData(position: Int) {
+        cartItemList.removeAt(position)
+        notifyDataSetChanged()
+    }
+
     fun getTotalPrice(): Double {
         var totalPrice = 0.0
         for (cartItem in cartItemList) {
@@ -42,6 +65,14 @@ class CartAdapter() : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
             }
         }
         return totalPrice
+    }
+
+    fun setOnIncreClickListener(listener: OnItemClickListener) {
+        onIncreClickListener = listener
+    }
+
+    fun setOnDecreClickListener(listener: OnItemClickListener) {
+        onDecreClickListener = listener
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -84,6 +115,18 @@ class CartAdapter() : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
             } else {
                 binding.imageFavorite.setBackgroundResource(R.drawable.bg_ellipse)
                 binding.imageFavorite.setImageResource(R.drawable.ic_favor_white)
+            }
+            binding.textIncreProduct.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onIncreClickListener?.onItemClick(position)
+                }
+            }
+            binding.textDecreProduct.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onDecreClickListener?.onItemClick(position)
+                }
             }
         }
     }
