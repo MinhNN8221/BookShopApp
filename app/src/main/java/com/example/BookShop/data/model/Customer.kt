@@ -17,11 +17,11 @@ data class Customer(
     @SerializedName("password_again")
     var passwordAgain: String = "",
     @SerializedName("address")
-    var address: String? = null,
+    var address: String = "",
     @SerializedName("shipping_region_id")
     var shippingRegionId: Int? = null,
     @SerializedName("mob_phone")
-    var mobPhone: String? = null,
+    var mobPhone: String = "",
     @SerializedName("gender")
     var gender: String? = null,
     @SerializedName("date_of_birth")

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -20,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.BookShop.R
 import com.example.BookShop.data.model.Product
 import com.example.BookShop.databinding.FragmentCategoryBookBinding
-import com.example.BookShop.ui.adapter.ProductAdapter
+import com.example.BookShop.ui.adapter.BookAdapter
 import com.example.BookShop.ui.adapter.OnItemClickListener
 import com.example.BookShop.ui.productdetail.ProductdetailFragment
 import com.example.BookShop.utils.ItemSpacingDecoration
@@ -33,7 +34,7 @@ class CategoryBookFragment : Fragment() {
 
     private lateinit var viewModel: CategoryBookViewModel
     private var binding: FragmentCategoryBookBinding? = null
-    private lateinit var adapter: ProductAdapter
+    private lateinit var adapter: BookAdapter
     private lateinit var layoutManager: GridLayoutManager
     private var bookList = mutableListOf<Product>()
     private var currentPage = 1
@@ -58,7 +59,7 @@ class CategoryBookFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = ProductAdapter()
+        adapter = BookAdapter(false)
         initViewModel()
         navToProductDetail()
         val categoryId = arguments?.getString("categoryId")?.toInt()
@@ -96,8 +97,10 @@ class CategoryBookFragment : Fragment() {
             swipeRefresh.setOnRefreshListener {
                 Handler().postDelayed({
                     swipeRefresh.isRefreshing = false
+                    bookList.clear()
+                    currentPage = 1
                     categoryId?.let {
-                        viewModel.getProductsInCategory(it, 10, currentPage, 100)
+                        viewModel.getProductsInCategory(it, 10, 1, 100)
                     }
                 }, 1000)
             }
@@ -116,9 +119,9 @@ class CategoryBookFragment : Fragment() {
 
                 override fun onQueryTextChange(newText: String): Boolean {
                     if (newText.isEmpty()) {
-                        currentPage = 1
+//                        currentPage = 1
                         categoryId.let { categoryId ->
-                            viewModel.getProductsInCategory(categoryId, 10, 1, 100)
+                            viewModel.getProductsInCategory(categoryId, 10, currentPage, 100)
                         }
                         loadingLayout.root.visibility = View.VISIBLE
                     } else {
@@ -146,7 +149,7 @@ class CategoryBookFragment : Fragment() {
                     totalPosition = adapter.itemCount
                     if (lastPosition != currentPosition && ((lastPosition == totalPosition - 3 && totalPosition % 2 == 0) || (lastPosition == totalPosition - 2 && totalPosition % 2 != 0))) {
                         currentPage++
-                        categoryId.let { categoryId ->
+                        categoryId?.let {
                             viewModel.getProductsInCategory(categoryId, 10, currentPage, 100)
                         }
                         currentPosition = lastPosition
@@ -183,18 +186,29 @@ class CategoryBookFragment : Fragment() {
     }
 
     private fun initViewModel() {
-        viewModel.producList.observe(viewLifecycleOwner, Observer { productList ->
-            if (pastPage != currentPage) {
-                if (currentPage > 1) {
-                    bookList.addAll(productList)
+        viewModel.producList.observe(viewLifecycleOwner, Observer { state ->
+            val isDefaultState = state.isDefaultState
+            state.products?.let {
+                if (it.isEmpty()) {
+                    currentPage = 1
                 } else {
-                    bookList.clear()
-                    bookList.addAll(productList)
+                    if (pastPage != currentPage && isDefaultState) {
+                        if (currentPage > 1) {
+                            bookList.addAll(it)
+                        } else {
+                            bookList.clear()
+                            bookList.addAll(it)
+                        }
+                    } else if (!isDefaultState) {
+                        bookList.clear()
+                        bookList.addAll(it)
+                    }
                 }
+                adapter.setData(bookList)
+                navToProductDetail()
+                addItemToCart()
+                binding?.loadingLayout?.root?.visibility = View.INVISIBLE
             }
-            adapter.setData(bookList)
-            addItemToCart()
-            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
         })
     }
 }

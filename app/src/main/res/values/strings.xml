@@ -40,6 +40,7 @@
     <string name="searchSelling">Bán Chạy</string>
     <string name="searchPrice">Giá</string>
     <string name="myOrder">Order</string>
+    <string name="orderInfor">Order Information</string>
     <string name="orderDetail">Order Detail</string>
     <string name="author">Tác giả</string>
     <string name="publisher">NXB</string>

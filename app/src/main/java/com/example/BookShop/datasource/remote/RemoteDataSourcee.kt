@@ -24,6 +24,10 @@ class RemoteDataSource() : IDataSource {
         return RetrofitClient.apiService.register(email, name, password)
     }
 
+    override suspend fun getProductsBanner(): Response<BannerList>? {
+        return RetrofitClient.apiService.getProductBanner()
+    }
+
     override suspend fun getSearchProducts(
         limit: Int,
         page: Int,
@@ -125,10 +129,6 @@ class RemoteDataSource() : IDataSource {
         return RetrofitClient.apiService.getProductsBySupplier(id, limit, page, description_length)
     }
 
-    override suspend fun getAuthor(authorId: Int): Response<AuthorResult>? {
-        return RetrofitClient.apiService.getAuthor(authorId)
-    }
-
     override suspend fun getSearchNewProduct(): Response<ProductNewList>? {
         return RetrofitClient.apiService.getSearchNewProduct()
     }
@@ -145,6 +145,14 @@ class RemoteDataSource() : IDataSource {
         mob_phone: String,
     ): Response<Customer>? {
         return RetrofitClient.apiService.updateCustomer(name, address, dob, gender, mob_phone)
+    }
+
+    override suspend fun updateOrderInfor(
+        name: String,
+        address: String,
+        mob_phone: String,
+    ): Response<Customer>? {
+        return RetrofitClient.apiService.updateOrderInfor(name, address, mob_phone)
     }
 
     override suspend fun changePassword(
@@ -167,8 +175,12 @@ class RemoteDataSource() : IDataSource {
         return RetrofitClient.apiService.getOrderDetail(orderId)
     }
 
-    override suspend fun getAllAuthor(): Response<AuthorList>? {
-        return RetrofitClient.apiService.getAuthor()
+    override suspend fun getAuthor(authorId: Int): Response<AuthorInfor>? {
+        return RetrofitClient.apiService.getAuthor(authorId)
+    }
+
+    override suspend fun getHotAuthor(): Response<AuthorFamousList>? {
+        return RetrofitClient.apiService.getHotAuthor()
     }
 
     override suspend fun addCartItem(productId: Int): Response<List<CartItem>>? {
@@ -214,8 +226,20 @@ class RemoteDataSource() : IDataSource {
         return RetrofitClient.apiService.getAllCart()
     }
 
-    override suspend fun getCategory(): Response<CategoryList>? {
-        return RetrofitClient.apiService.getCategory()
+    override suspend fun getAllCategory(): Response<CategoryList>? {
+        return RetrofitClient.apiService.getAllCategory()
+    }
+
+    override suspend fun getHotCategory(): Response<CategoryList>? {
+        return RetrofitClient.apiService.getHotCategory()
+    }
+
+    override suspend fun getNewBook(): Response<BookInHomeList>? {
+        return RetrofitClient.apiService.getHotBook()
+    }
+
+    override suspend fun getHotBook(): Response<BookInHomeList>? {
+        return RetrofitClient.apiService.getNewBook()
     }
 
     override suspend fun createOrder(

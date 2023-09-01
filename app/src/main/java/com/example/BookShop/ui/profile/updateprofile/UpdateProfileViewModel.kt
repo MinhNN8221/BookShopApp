@@ -5,8 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.BookShop.data.model.Customer
-import com.example.BookShop.data.model.ErrorResponse
+import com.example.BookShop.data.model.*
 import com.example.BookShop.data.repository.user.UserRepository
 import com.example.BookShop.data.repository.user.UserRepositoryImp
 import com.example.BookShop.datasource.remote.RemoteDataSource
@@ -44,11 +43,41 @@ class UpdateProfileViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = userRepository?.updateCustomer(name, address, dob, gender, mob_phone)
             if (response?.isSuccessful == true) {
-                _message.postValue("UPDATE SUCCESSFUL!")
+                _message.postValue("Update Successful!")
             } else {
-                val errorBody=response?.errorBody()?.string()
-                val gson=Gson()
-                val errorResponse=gson.fromJson(errorBody, ErrorResponse::class.java)
+                val errorBody = response?.errorBody()?.string()
+                val gson = Gson()
+                val errorResponse = gson.fromJson(errorBody, ErrorResponse::class.java)
+                _message.postValue(errorResponse.error.message)
+            }
+        }
+    }
+
+    fun checkFields(user: AuthResponse) {
+        if (user.isUpdateOrderInfor()) {
+            _message.postValue("Fields cannot be empty!")
+            return
+        }
+        if (!user.isValidPhone()) {
+            _message.postValue("Please enter the correct format of the phone number!")
+            return
+        }
+        updateOrderInfor(user)
+    }
+
+    fun updateOrderInfor(user: AuthResponse) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = userRepository?.updateOrderInfor(
+                user.customer.name,
+                user.customer.address,
+                user.customer.mobPhone
+            )
+            if (response?.isSuccessful == true) {
+                _message.postValue("Update Successful!")
+            } else {
+                val errorBody = response?.errorBody()?.string()
+                val gson = Gson()
+                val errorResponse = gson.fromJson(errorBody, ErrorResponse::class.java)
                 _message.postValue(errorResponse.error.message)
             }
         }

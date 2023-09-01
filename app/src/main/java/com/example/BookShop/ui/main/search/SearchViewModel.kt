@@ -19,8 +19,8 @@ import com.example.BookShop.datasource.remote.RemoteDataSource
 import kotlinx.coroutines.*
 
 class SearchViewModel(application: Application) : ViewModel() {
-    private val _productList = MutableLiveData<List<Product>>()
-    val productList: LiveData<List<Product>> get() = _productList
+    private val _productState = MutableLiveData<ProductState>()
+    val productState: LiveData<ProductState> get() = _productState
     private val _historyList = MutableLiveData<List<String>>()
     val historyList: LiveData<List<String>> get() = _historyList
 
@@ -51,12 +51,11 @@ class SearchViewModel(application: Application) : ViewModel() {
                 price_sort_order
             )
             if (response?.isSuccessful == true) {
-//                if (query_string.isEmpty()) {
-//                    _productList.postValue(ProductState(response.body()?.products, true))
-//                } else {
-//                    _productList.postValue(ProductState(response.body()?.products, false))
-//                }
-                _productList.postValue(response.body()?.products)
+                if (query_string.isEmpty()) {
+                    _productState.postValue(ProductState(response.body()?.products, true))
+                } else {
+                    _productState.postValue(ProductState(response.body()?.products, false))
+                }
             } else {
                 Log.d("SearchProduct", "NULLLL")
             }

@@ -5,30 +5,45 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.BookShop.data.model.Category
-import com.example.BookShop.databinding.ItemCategoryIndexBinding
+import com.example.BookShop.databinding.ItemCategoryBinding
+import com.example.BookShop.databinding.ItemCategoryHotBinding
 
-class CategoryIndexAdapter() :
-    RecyclerView.Adapter<CategoryIndexAdapter.ViewHolder>() {
+class CategoryIndexAdapter(private val isStateCategoryHot: Boolean) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private lateinit var onItemClickListener: OnItemClickListener
     private var categoryList: MutableList<Category> = mutableListOf()
+
+    companion object {
+        private const val VIEW_TYPE_HOT = 0
+        private const val VIEW_TYPE_ALL = 1
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
-    ): CategoryIndexAdapter.ViewHolder {
+    ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemCategoryIndexBinding.inflate(inflater, parent, false)
-        return ViewHolder(binding)
+        return if (viewType == VIEW_TYPE_ALL) {
+            val binding = ItemCategoryBinding.inflate(inflater, parent, false)
+            ItemAllViewHolder(binding)
+        } else {
+            val binding = ItemCategoryHotBinding.inflate(inflater, parent, false)
+            ItemHotViewHolder(binding)
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(categories: List<Category>) {
+    fun setDataCategory(categories: List<Category>) {
         categoryList.clear()
         categoryList.addAll(categories)
         notifyDataSetChanged()
     }
 
-    override fun onBindViewHolder(holder: CategoryIndexAdapter.ViewHolder, position: Int) {
-        holder.bind(categoryList[position])
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is ItemAllViewHolder -> holder.bind(categoryList[position])
+            is ItemHotViewHolder -> holder.bind(categoryList[position])
+        }
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
@@ -43,10 +58,26 @@ class CategoryIndexAdapter() :
         return categoryList.size
     }
 
-    inner class ViewHolder(private val binding: ItemCategoryIndexBinding) :
+    override fun getItemViewType(position: Int): Int {
+        return if (isStateCategoryHot) VIEW_TYPE_HOT else VIEW_TYPE_ALL
+    }
+
+    inner class ItemAllViewHolder(private val binding: ItemCategoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(category: Category) {
             binding.nameCategory.text = category.name
+            binding.cardviewCategory.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClickListener.onItemClick(position)
+                }
+            }
+        }
+    }
+    inner class ItemHotViewHolder(private val binding: ItemCategoryHotBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(category: Category) {
+            binding.textCategoryHot.text = category.name
             binding.cardviewCategory.setOnClickListener {
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {

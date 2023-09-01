@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.BookShop.data.model.Product
+import com.example.BookShop.data.model.ProductState
 import com.example.BookShop.data.repository.cart.CartRepository
 import com.example.BookShop.data.repository.cart.CartRepositoryImp
 import com.example.BookShop.data.repository.product.ProductRepository
@@ -18,8 +19,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class PublisherViewModel : ViewModel() {
-    private var _productList = MutableLiveData<List<Product>>()
-    val productList: LiveData<List<Product>> get() = _productList
+    private var _productState = MutableLiveData<ProductState>()
+    val productState: LiveData<ProductState> get() = _productState
     private var productRepository: ProductRepository? = ProductRepositoryImp(RemoteDataSource())
     private var searchRepository: SearchRepository? = SearchRepositoryImp(RemoteDataSource())
     private var cartRepository: CartRepository? = CartRepositoryImp(RemoteDataSource())
@@ -30,7 +31,7 @@ class PublisherViewModel : ViewModel() {
             val response =
                 productRepository?.getProductsBySupplier(categoryId, limit, page, desLength)
             if (response?.isSuccessful == true) {
-                _productList.postValue(response.body()?.products)
+                _productState.postValue(ProductState(response.body()?.products, true))
             } else {
                 Log.d("getProdcutInSupplier", "NULLLL")
             }
@@ -48,7 +49,7 @@ class PublisherViewModel : ViewModel() {
                     queryString
                 )
             if (response?.isSuccessful == true) {
-                _productList.postValue(response.body()?.products)
+                _productState.postValue(ProductState(response.body()?.products, false))
             } else {
                 Log.d("searchSupplier", "NULLLL")
             }

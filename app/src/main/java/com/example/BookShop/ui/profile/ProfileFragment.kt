@@ -15,6 +15,7 @@ import com.example.BookShop.data.model.Customer
 import com.example.BookShop.databinding.FragmentProfileBinding
 import com.example.BookShop.databinding.LayoutAlertBinding
 import com.example.BookShop.ui.order.orderhistory.OrderHistoryFragment
+import com.example.BookShop.ui.order.orderinfor.OrderInforFragment
 import com.example.BookShop.ui.profile.changepass.ChangePassFragment
 import com.example.BookShop.ui.profile.profilesignin.ProfileSignInFragment
 import com.example.BookShop.ui.profile.updateprofile.UpdateProfileFragment
@@ -93,13 +94,18 @@ class ProfileFragment : Fragment() {
                 }
                 dialog.show()
             }
-            textChange.setOnClickListener {
+            textChangePassword.setOnClickListener {
                 val fragmentChangePass = ChangePassFragment()
                 val bundle = Bundle()
                 bundle.putString("email", email)
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, fragmentChangePass.apply { arguments = bundle })
                     .addToBackStack("profile").commit()
+            }
+            linearOrderInfor.setOnClickListener {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, OrderInforFragment()).addToBackStack("profile")
+                    .commit()
             }
             linearMyOrder.setOnClickListener {
                 parentFragmentManager.beginTransaction()

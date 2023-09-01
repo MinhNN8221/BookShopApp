@@ -13,6 +13,11 @@ interface UserRepository {
         gender: String,
         mob_phone: String,
     ): Response<Customer>?
+    suspend fun updateOrderInfor(
+        name: String,
+        address: String,
+        mob_phone: String,
+    ): Response<Customer>?
 
     suspend fun changePassword(
         email: String, old_password: String,

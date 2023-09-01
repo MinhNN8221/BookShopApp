@@ -10,11 +10,11 @@ import com.example.BookShop.utils.MySharedPreferences
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var bnd: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        bnd = ActivityMainBinding.inflate(layoutInflater)
-        val view: View = bnd.root
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view: View = binding.root
         setContentView(view)
         MySharedPreferences.init(this)
         val support = supportFragmentManager.beginTransaction()
@@ -23,8 +23,8 @@ class MainActivity : AppCompatActivity() {
             support.replace(R.id.container, fragmentOnboard).commit()
             setFirstLaunch(false)
         } else {
-            val fragmentSignin = SignInFragment()
-            support.replace(R.id.container, fragmentSignin).commit()
+            val fragmentSignIn = SignInFragment()
+            support.replace(R.id.container, fragmentSignIn).commit()
         }
     }
 

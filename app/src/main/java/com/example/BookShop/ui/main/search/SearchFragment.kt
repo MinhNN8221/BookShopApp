@@ -26,7 +26,7 @@ import com.example.BookShop.data.model.HistorySearch
 import com.example.BookShop.data.model.Product
 import com.example.BookShop.databinding.FragmentSearchBinding
 import com.example.BookShop.datasource.local.db.entity.ProductDb
-import com.example.BookShop.ui.adapter.ProductAdapter
+import com.example.BookShop.ui.adapter.BookAdapter
 import com.example.BookShop.ui.adapter.HistorySeachAdapter
 import com.example.BookShop.ui.adapter.OnItemClickListener
 import com.example.BookShop.ui.productdetail.ProductdetailFragment
@@ -36,7 +36,7 @@ import com.example.BookShop.utils.MySharedPreferences
 class SearchFragment : Fragment() {
     private var binding: FragmentSearchBinding? = null
     private lateinit var viewModel: SearchViewModel
-    private lateinit var adapter: ProductAdapter
+    private lateinit var adapter: BookAdapter
     private lateinit var adapterHistory: HistorySeachAdapter
     private var bookList = mutableListOf<Product>()
     private var list = mutableListOf<HistorySearch>()
@@ -71,7 +71,7 @@ class SearchFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = ProductAdapter()
+        adapter = BookAdapter(false)
         adapterHistory = HistorySeachAdapter()
         adapter.clearData()
         initViewModel()
@@ -123,20 +123,29 @@ class SearchFragment : Fragment() {
         }
         handleLoadData()
     }
+
     private fun initViewModel() {
-        viewModel.productList.observe(viewLifecycleOwner) { productList ->
-            if (pastPage != currentPage) {
-                if (currentPage > 1) {
-                    bookList.addAll(productList)
-                } else {
+        viewModel.productState.observe(viewLifecycleOwner) { state ->
+            val isDefaultState = state.isDefaultState
+            state.products.let {
+                if (pastPage != currentPage && isDefaultState) {
+                    it?.let { productList ->
+                        if (currentPage > 1) {
+                            bookList.addAll(productList)
+                        } else {
+                            bookList.clear()
+                            bookList.addAll(productList)
+                        }
+                    }
+                } else if (!isDefaultState) {
                     bookList.clear()
-                    bookList.addAll(productList)
+                    it?.let { productList -> bookList.addAll(productList) }
                 }
+                adapter.setData(bookList)
+                binding?.loadingLayout?.root?.visibility = View.INVISIBLE
+                addItemToCart()
+                navToProductDetail()
             }
-            adapter.setData(bookList)
-            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
-            addItemToCart()
-            navToProductDetail()
         }
         viewModel.historyList.observe(viewLifecycleOwner) {
             list.clear()
@@ -160,6 +169,7 @@ class SearchFragment : Fragment() {
             searchSuggestProduct()
         }
     }
+
     private fun handleSearch() {
         binding?.apply {
             editSearch.setOnFocusChangeListener { v, hasFocus ->
@@ -208,7 +218,7 @@ class SearchFragment : Fragment() {
         binding?.apply {
             imageSeach.setOnClickListener {
                 queryString = editSearch.text.toString()
-                if (!queryString.isEmpty()) {
+                if (queryString.isNotEmpty()) {
                     viewModel.insertHistorySearchLocal(
                         ProductDb(
                             idCustomer = idCustomer,
@@ -350,7 +360,7 @@ class SearchFragment : Fragment() {
                     } else {
                         floatButton.visibility = View.INVISIBLE
                     }
-                    if (currentPosition != lastPosition && lastPosition == totalPosition - 3) {
+                    if (lastPosition != currentPosition && ((lastPosition == totalPosition - 3 && totalPosition % 2 == 0) || (lastPosition == totalPosition - 2 && totalPosition % 2 != 0))) {
                         currentPage++
                         viewModel.getSearchProducts(
                             10,
@@ -367,7 +377,7 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun refreshData(){
+    private fun refreshData() {
         binding?.apply {
             swipeRefresh.setOnRefreshListener {
                 Handler().postDelayed(

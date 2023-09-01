@@ -1,6 +1,5 @@
 package com.example.BookShop.data.api
 
-import androidx.room.Update
 import com.example.BookShop.data.model.*
 import okhttp3.MultipartBody
 import retrofit2.Response
@@ -28,14 +27,23 @@ interface ApiInterface {
         @Field("password") password: String,
     ): Response<AuthResponse>
 
+    @GET("products/recommend")
+    suspend fun getProductBanner(): Response<BannerList>
+
     @GET("products")
     suspend fun getProducts(): Response<ProductList>
 
     @GET("category")
-    suspend fun getCategory(): Response<CategoryList>
+    suspend fun getAllCategory(): Response<CategoryList>
 
-    @GET("author/hot")
-    suspend fun getAuthor(): Response<AuthorList>
+    @GET("category/hot")
+    suspend fun getHotCategory(): Response<CategoryList>
+
+    @GET("products/new")
+    suspend fun getNewBook(): Response<BookInHomeList>
+
+    @GET("products/hot")
+    suspend fun getHotBook(): Response<BookInHomeList>
 
     @GET("products/search")
     suspend fun getSearchProducts(
@@ -106,8 +114,11 @@ interface ApiInterface {
         @Query("description_length") description_length: Int,
     ): Response<ProductList>
 
+    @GET("author/hot")
+    suspend fun getHotAuthor(): Response<AuthorFamousList>
+
     @GET("author/{authorId}")
-    suspend fun getAuthor(@Path("authorId") authorId: Int): Response<AuthorResult>
+    suspend fun getAuthor(@Path("authorId") authorId: Int): Response<AuthorInfor>
 
     @GET("products/new")
     suspend fun getSearchNewProduct(): Response<ProductNewList>
@@ -122,6 +133,14 @@ interface ApiInterface {
         @Field("address") address: String,
         @Field("date_of_birth") dateofbirth: String,
         @Field("gender") gender: String,
+        @Field("mob_phone") mobphone: String,
+    ): Response<Customer>
+
+    @FormUrlEncoded
+    @PUT("customers")
+    suspend fun updateOrderInfor(
+        @Field("name") name: String,
+        @Field("address") address: String,
         @Field("mob_phone") mobphone: String,
     ): Response<Customer>
 
@@ -146,7 +165,6 @@ interface ApiInterface {
     suspend fun getOrderDetail(@Path("orderId") orderId: Int): Response<OrderDetail>
 
     @FormUrlEncoded
-
     @POST("shoppingCart/add")
     suspend fun addProduct2Cart(@Field("product_id") productId: Int): Response<List<CartItem>>
 

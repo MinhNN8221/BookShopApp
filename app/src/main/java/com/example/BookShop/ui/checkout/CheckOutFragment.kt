@@ -4,14 +4,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.BookShop.R
 import com.example.BookShop.databinding.FragmentCheckOutBinding
-import com.example.BookShop.ui.adapter.BookAdapter
+import com.example.BookShop.databinding.FragmentMainMenuBinding
+import com.example.BookShop.ui.adapter.BookListAdapter
+import com.example.BookShop.ui.adapter.ViewPager2Adapter
+import com.example.BookShop.ui.main.MainMenuFragment
+import com.example.BookShop.ui.main.cart.CartFragment
 import com.example.BookShop.ui.main.cart.CartViewModel
+import com.example.BookShop.ui.main.home.HomeFragment
+import com.example.BookShop.ui.main.search.SearchFragment
+import com.example.BookShop.ui.main.wishlist.WishlistFragment
+import com.example.BookShop.ui.order.orderinfor.OrderInforFragment
 import com.example.BookShop.ui.profile.ProfileViewModel
 import com.example.BookShop.ui.profile.ProfileViewModelFactory
 import com.example.BookShop.utils.FormatMoney
@@ -28,9 +37,10 @@ class CheckOutFragment : Fragment() {
     private lateinit var viewModelProfile: ProfileViewModel
     private lateinit var loadingProgressBar: LoadingProgressBar
     private var binding: FragmentCheckOutBinding? = null
-    private lateinit var adapter: BookAdapter
+    private lateinit var adapter: BookListAdapter
     private var formatMoney = FormatMoney()
     private var cartId = ""
+    private var check = false
     private var shippingId = 1
     private var shippingPrice = 50000.00
 
@@ -52,39 +62,32 @@ class CheckOutFragment : Fragment() {
         )[ProfileViewModel::class.java]
         loadingProgressBar = LoadingProgressBar(requireContext())
         loadingProgressBar.show()
-        adapter = BookAdapter()
+        adapter = BookListAdapter()
         initViewModel()
         viewModelCart.getCartId()
         viewModelCart.getAllCartItem()
         viewModelProfile.getCustomer()
 
         binding?.apply {
+            textChangeInfor.setOnClickListener {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, OrderInforFragment())
+                    .addToBackStack("CheckOut")
+                    .commit()
+            }
             textPayment.setOnClickListener {
                 val address = textCutomerAddress.text.toString()
                 val receiverName = textCustomerName.text.toString()
                 val receiverPhone = textCutomerPhone.text.toString()
-//                viewModelCheckOut.createOrder(
-//                    cartId,
-//                    shippingId,
-//                    address,
-//                    receiverName,
-//                    receiverPhone
-//                )
-                AlertDialog.Builder(requireContext())
-                    .setMessage("hello")
-                    .setCancelable(false)
-                    .setPositiveButton("Close") { dialog, _ ->
-//                    if(it.isState) {
-//                        parentFragmentManager.popBackStack()
-//                        dialog.cancel()
-//                    }else{
-//                        dialog.cancel()
-//                    }
-                        parentFragmentManager.popBackStack()
-                        dialog.cancel()
-                    }
-                    .show()
-//                loadingProgressBar.show()
+                viewModelCheckOut.createOrder(
+                    cartId,
+                    shippingId,
+                    address,
+                    receiverName,
+                    receiverPhone
+                )
+                check = true
+                loadingProgressBar.show()
             }
             imageLeft.setOnClickListener {
                 parentFragmentManager.popBackStack()
@@ -98,20 +101,21 @@ class CheckOutFragment : Fragment() {
     private fun initViewModel() {
         viewModelCheckOut.message.observe(viewLifecycleOwner) {
             loadingProgressBar.cancel()
-            AlertDialog.Builder(requireContext())
-                .setMessage(it.message.message.capitalize())
-                .setCancelable(false)
-                .setPositiveButton("Close") { dialog, _ ->
-//                    if(it.isState) {
-//                        parentFragmentManager.popBackStack()
-//                        dialog.cancel()
-//                    }else{
-//                        dialog.cancel()
-//                    }
-                    parentFragmentManager.popBackStack()
-                    dialog.cancel()
-                }
-                .show()
+            if (check) {
+                AlertDialog.Builder(requireContext())
+                    .setMessage(it.message.message.capitalize())
+                    .setCancelable(false)
+                    .setPositiveButton("Close") { dialog, _ ->
+                        if (it.isState) {
+                            parentFragmentManager.popBackStack()
+                            dialog.cancel()
+                        } else {
+                            dialog.cancel()
+                        }
+                    }
+                    .show()
+                check=false
+            }
         }
         viewModelCart.cartItem.observe(viewLifecycleOwner) { cartItem ->
             loadingProgressBar.cancel()

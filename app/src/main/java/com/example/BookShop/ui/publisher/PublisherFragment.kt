@@ -21,9 +21,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.BookShop.R
 import com.example.BookShop.data.model.Product
 import com.example.BookShop.databinding.FragmentPublisherBinding
-import com.example.BookShop.ui.adapter.BookAdapter
+import com.example.BookShop.ui.adapter.BookListAdapter
 import com.example.BookShop.ui.adapter.OnItemClickListener
-import com.example.BookShop.ui.adapter.ProductAdapter
+import com.example.BookShop.ui.adapter.BookAdapter
 import com.example.BookShop.ui.productdetail.ProductdetailFragment
 import com.example.BookShop.utils.ItemSpacingDecoration
 import com.example.BookShop.utils.LoadingProgressBar
@@ -32,8 +32,8 @@ class PublisherFragment : Fragment() {
 
     private var binding: FragmentPublisherBinding? = null
     private lateinit var viewModel: PublisherViewModel
-    private lateinit var adapter: ProductAdapter
-    private lateinit var adapterList: BookAdapter
+    private lateinit var adapter: BookAdapter
+    private lateinit var adapterList: BookListAdapter
     private lateinit var loadingProgressBar: LoadingProgressBar
     private var bookList = mutableListOf<Product>()
     private var currentPage = 1
@@ -60,8 +60,8 @@ class PublisherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[PublisherViewModel::class.java]
-        adapter = ProductAdapter()
-        adapterList = BookAdapter()
+        adapter = BookAdapter(false)
+        adapterList = BookListAdapter()
         loadingProgressBar = LoadingProgressBar(requireContext())
         loadingProgressBar.show()
         initViewModel()
@@ -138,18 +138,30 @@ class PublisherFragment : Fragment() {
     }
 
     private fun initViewModel() {
-        viewModel.productList.observe(viewLifecycleOwner) { productList ->
-            if (pastPage != currentPage) {
-                if (currentPage > 1) {
-                    bookList.addAll(productList)
+        viewModel.productState.observe(viewLifecycleOwner) { state ->
+            val isDefaultState = state.isDefaultState
+            state.products?.let {
+                if (it.isEmpty()) {
+                    currentPage = 1
                 } else {
-                    bookList.clear()
-                    bookList.addAll(productList)
+                    if (pastPage != currentPage && isDefaultState) {
+                        if (currentPage > 1) {
+                            bookList.addAll(it)
+                        } else {
+                            bookList.clear()
+                            bookList.addAll(it)
+                        }
+                    } else if (!isDefaultState) {
+                        bookList.clear()
+                        bookList.addAll(it)
+                    }
                 }
+                adapter.setData(bookList)
+                adapterList.setDataProduct(bookList)
+                navToProductDetail()
+                addItemToCart()
+                loadingProgressBar.cancel()
             }
-            adapter.setData(bookList)
-            adapterList.setDataProduct(bookList)
-            loadingProgressBar.cancel()
         }
     }
 
@@ -209,7 +221,7 @@ class PublisherFragment : Fragment() {
 
                 override fun onQueryTextChange(newText: String): Boolean {
                     if (newText.isEmpty()) {
-                        currentPage = 1
+//                        currentPage = 1
                         supplierId.let { supplierId ->
                             viewModel.getProductsBySupplier(supplierId, 10, 1, 100)
                         }

@@ -15,13 +15,11 @@ import com.example.BookShop.ui.adapter.CategoryIndexAdapter
 import com.example.BookShop.ui.adapter.OnItemClickListener
 import com.example.BookShop.ui.category.CategoryBookFragment
 import com.example.BookShop.utils.MySpanLookSize
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class CategoryIndexFragment : Fragment() {
 
     private lateinit var binding: FragmentCategoryIndexBinding
     private lateinit var adapter: CategoryIndexAdapter
-//    private var widthRecycler = 0
 
     companion object {
         fun newInstance() = CategoryIndexFragment()
@@ -44,11 +42,11 @@ class CategoryIndexFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = CategoryIndexAdapter()
+        adapter = CategoryIndexAdapter(false)
         val layoutManager = GridLayoutManager(context, 2)
-        viewModel.categoryList.observe(viewLifecycleOwner, Observer {
-            if (it != null) {
-                adapter.setData(it)
+        viewModel.categoryAllList.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                adapter.setDataCategory(it)
             }
             binding.loadingLayout.root.visibility = View.INVISIBLE
         })
@@ -67,7 +65,7 @@ class CategoryIndexFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 val bundle = Bundle()
                 val categoryId = adapter.getCategory(position).categoryId
-                val categoryName=adapter.getCategory(position).name
+                val categoryName = adapter.getCategory(position).name
                 bundle.putString("categoryId", categoryId.toString())
                 bundle.putString("categoryName", categoryName)
                 parentFragmentManager.beginTransaction()

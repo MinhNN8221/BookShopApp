@@ -8,6 +8,8 @@ interface IDataSource {
     suspend fun login(email: String, password: String): Response<AuthResponse>?
     suspend fun forgotPassword(email: String): Response<Message>
     suspend fun register(email: String, name: String, password: String): Response<AuthResponse>
+
+    suspend fun getProductsBanner(): Response<BannerList>?
     suspend fun getSearchProducts(
         limit: Int,
         page: Int,
@@ -46,7 +48,6 @@ interface IDataSource {
     ): Response<ProductList>?
 
     suspend fun getProductInfo(id: Int): Response<ProductInfoList>?
-    suspend fun getAllAuthor(): Response<AuthorList>?
     suspend fun getProductsByAuthor(
         id: Int,
         limit: Int,
@@ -68,7 +69,8 @@ interface IDataSource {
         description_length: Int,
     ): Response<ProductList>?
 
-    suspend fun getAuthor(authorId: Int): Response<AuthorResult>?
+    suspend fun getAuthor(authorId: Int): Response<AuthorInfor>?
+    suspend fun getHotAuthor(): Response<AuthorFamousList>?
     suspend fun getSearchNewProduct(): Response<ProductNewList>?
     suspend fun getCustomer(): Response<Customer>?
     suspend fun updateCustomer(
@@ -76,6 +78,12 @@ interface IDataSource {
         address: String,
         dob: String,
         gender: String,
+        mob_phone: String,
+    ): Response<Customer>?
+
+    suspend fun updateOrderInfor(
+        name: String,
+        address: String,
         mob_phone: String,
     ): Response<Customer>?
 
@@ -88,11 +96,12 @@ interface IDataSource {
     suspend fun getOrderHistory(): Response<OrderList>?
     suspend fun getOrderDetail(orderId: Int): Response<OrderDetail>?
     suspend fun addCartItem(productId: Int): Response<List<CartItem>>?
-    suspend fun addItemToWishList(productId: Int): Response<Message>?
+    suspend fun getAllCart(): Response<Cart>?
     suspend fun addAllItemToCart(): Response<Message>
     suspend fun deleteAllItemCart(): Response<Message>
     suspend fun changeProductQuantityInCart(itemId: Int, quantity: Int): Response<Message>?
     suspend fun removeItemInCart(itemId: Int): Response<Message>?
+    suspend fun addItemToWishList(productId: Int): Response<Message>?
     suspend fun removeItemInWishList(productId: Int): Response<Message>
     suspend fun getWishList(
         limit: Int,
@@ -100,8 +109,10 @@ interface IDataSource {
         description_length: Int,
     ): Response<WishlistResponse>?
 
-    suspend fun getAllCart(): Response<Cart>?
-    suspend fun getCategory(): Response<CategoryList>?
+    suspend fun getAllCategory(): Response<CategoryList>?
+    suspend fun getHotCategory(): Response<CategoryList>?
+    suspend fun getNewBook(): Response<BookInHomeList>?
+    suspend fun getHotBook(): Response<BookInHomeList>?
     suspend fun createOrder(
         cartId: String,
         shippingId: Int,

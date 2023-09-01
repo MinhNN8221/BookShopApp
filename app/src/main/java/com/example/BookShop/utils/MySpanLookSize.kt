@@ -3,7 +3,7 @@ package com.example.BookShop.utils
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.BookShop.ui.adapter.CategoryIndexAdapter
 
-class MySpanLookSize(val adapter: CategoryIndexAdapter, val spanCount1: Int, val spanCount2: Int) :
+class MySpanLookSize(var adapter: CategoryIndexAdapter, val spanCount1: Int, val spanCount2: Int) :
     GridLayoutManager.SpanSizeLookup() {
     override fun getSpanSize(position: Int): Int {
         val size = adapter.getCategory(position).name?.length

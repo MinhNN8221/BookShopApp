@@ -1,11 +1,10 @@
 package com.example.BookShop.data.repository.product
 
-import com.example.BookShop.data.model.ProductInfoList
-import com.example.BookShop.data.model.ProductList
-import com.example.BookShop.data.model.ProductsByAuthor
+import com.example.BookShop.data.model.*
 import retrofit2.Response
 
 interface ProductRepository {
+    suspend fun getProductsBanner(): Response<BannerList>?
     suspend fun getProductInfo(id: Int): Response<ProductInfoList>?
     suspend fun getProductsByAuthor(
         author_id: Int,
@@ -27,4 +26,7 @@ interface ProductRepository {
         page: Int,
         description_length: Int,
     ): Response<ProductList>?
+
+    suspend fun getNewBook(): Response<BookInHomeList>?
+    suspend fun getHotBook(): Response<BookInHomeList>?
 }

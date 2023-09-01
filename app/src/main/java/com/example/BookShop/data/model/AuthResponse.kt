@@ -14,6 +14,9 @@ data class AuthResponse(
         return TextUtils.isEmpty(customer.email) || TextUtils.isEmpty(customer.password)
     }
 
+    fun isUpdateOrderInfor():Boolean{
+        return TextUtils.isEmpty(customer.mobPhone) || TextUtils.isEmpty(customer.name) || TextUtils.isEmpty(customer.address)
+    }
     fun isSignUpFieldEmpty(): Boolean {
         return TextUtils.isEmpty(customer.email) || TextUtils.isEmpty(customer.password) || TextUtils.isEmpty(
             customer.name
@@ -42,4 +45,8 @@ data class AuthResponse(
         return password == customer.passwordAgain
     }
 
+    fun isValidPhone(): Boolean {
+        val pattern = Regex("^0\\d{9}$")
+        return pattern.matches(customer.mobPhone)
+    }
 }

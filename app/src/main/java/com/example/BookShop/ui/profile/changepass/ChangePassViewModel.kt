@@ -37,7 +37,7 @@ class ChangePassViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = userRepository?.changePassword(user.customer.email, user.customer.password, user.customer.newPassword)
             if (response?.isSuccessful == true) {
-                message.postValue("UPDATE PASSWORD SUCCESSFUL")
+                message.postValue("Update Password Successful")
             } else {
                 val errorBody=response?.errorBody()?.string()
                 val gson=Gson()

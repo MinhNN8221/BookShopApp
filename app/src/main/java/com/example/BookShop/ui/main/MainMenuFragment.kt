@@ -35,6 +35,7 @@ class MainMenuFragment : Fragment() {
         )
         val adapter = ViewPager2Adapter(requireActivity(), fragments)
         binding.viewPager.adapter = adapter
+        binding.viewPager.isUserInputEnabled = false
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)

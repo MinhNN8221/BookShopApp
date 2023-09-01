@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -85,7 +86,7 @@ class WishlistFragment : Fragment() {
                     lastPosition =
                         (recyclerWishList.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
                     totalPosition = adapter.itemCount
-                    if (lastPosition != currentPosition && ((lastPosition == totalPosition - 3 && totalPosition % 2 == 0) || (lastPosition == totalPosition - 2 && totalPosition % 2 != 0))) {
+                    if (lastPosition != currentPosition && lastPosition == totalPosition - 3) {
                         currentPage++
                         viewModel.getWishList(10, currentPage, 100)
                         currentPosition = lastPosition
@@ -108,7 +109,7 @@ class WishlistFragment : Fragment() {
                 binding?.textPrice?.text = formatMoney.formatMoney(adapter.getTotalPrice().toLong())
             }
         }
-        viewModel.message.observe(viewLifecycleOwner){
+        viewModel.message.observe(viewLifecycleOwner) {
             AlertMessageViewer.showAlertDialogMessage(requireContext(), it.message)
         }
     }

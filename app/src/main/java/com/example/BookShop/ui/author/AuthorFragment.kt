@@ -11,6 +11,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -24,7 +25,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.BookShop.R
 import com.example.BookShop.data.model.Product
-import com.example.BookShop.ui.adapter.ProductAdapter
+import com.example.BookShop.ui.adapter.BookAdapter
 import com.example.BookShop.databinding.FragmentAuthorBinding
 import com.example.BookShop.ui.adapter.OnItemClickListener
 import com.example.BookShop.ui.productdetail.ProductdetailFragment
@@ -38,7 +39,7 @@ class AuthorFragment : Fragment() {
 
     private lateinit var viewModel: AuthorViewModel
     private var binding: FragmentAuthorBinding? = null
-    private lateinit var adapter: ProductAdapter
+    private lateinit var adapter: BookAdapter
     private var bookList = mutableListOf<Product>()
     private var currentPage = 1
     private var lastPosition = 0
@@ -56,22 +57,22 @@ class AuthorFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[AuthorViewModel::class.java]
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = ProductAdapter()
-        binding?.loadingLayout?.root?.visibility = View.VISIBLE
-        initViewModel()
-        navToProductDetail()
-        addItemToCart()
+        viewModel = ViewModelProvider(this)[AuthorViewModel::class.java]
+        adapter = BookAdapter(false)
         val authorId = arguments?.getString("authorId")?.toInt()
         authorId?.let {
             viewModel.getProductsByAuthor(authorId, 10, currentPage, 100)
             viewModel.getAuthor(authorId)
         }
+        binding?.loadingLayout?.root?.visibility = View.VISIBLE
+        initViewModel()
+        navToProductDetail()
+        addItemToCart()
         val horizontalSpacing =
             resources.getDimensionPixelSize(R.dimen.horizontal_spacing)
         val verticalSpacing =
@@ -102,27 +103,38 @@ class AuthorFragment : Fragment() {
                     swipeRefresh.isRefreshing = false
                     authorId?.let {
                         viewModel.getAuthor(it)
-                        viewModel.getProductsByAuthor(it, 10, currentPage, 100)
+                        viewModel.getProductsByAuthor(it, 10, 1, 100)
                     }
                 }, 1000)
             }
+            swipeRefresh.setColorSchemeColors(resources.getColor(R.color.teal_200))
         }
         authorId?.let { handleLoadData(it) }
     }
 
 
     private fun initViewModel() {
-        viewModel.productList.observe(viewLifecycleOwner) { productList ->
-            if (pastPage != currentPage) {
-                if (currentPage > 1) {
-                    bookList.addAll(productList)
+        viewModel.productState.observe(viewLifecycleOwner) { state ->
+            val isDefaultState = state.isDefaultState
+            state.products?.let {
+                if (it.isEmpty()) {
+                    currentPage = 1
                 } else {
-                    bookList.clear()
-                    bookList.addAll(productList)
+                    if (pastPage != currentPage && isDefaultState) {
+                        if (currentPage > 1) {
+                            bookList.addAll(it)
+                        } else {
+                            bookList.clear()
+                            bookList.addAll(it)
+                        }
+                    } else if (!isDefaultState) {
+                        bookList.clear()
+                        bookList.addAll(it)
+                    }
                 }
+                adapter.setData(bookList)
+                binding?.loadingLayout?.root?.visibility = View.INVISIBLE
             }
-            adapter.setData(bookList)
-            binding?.loadingLayout?.root?.visibility = View.INVISIBLE
         }
         viewModel.author.observe(viewLifecycleOwner) {
             if (it != null) {
@@ -147,7 +159,7 @@ class AuthorFragment : Fragment() {
                     if (newText.isEmpty()) {
                         textAuthor.visibility = View.VISIBLE
                         textHot.visibility = View.VISIBLE
-                        currentPage = 1
+//                        if(currentPage==1 && currentPage==pastPage){pastPage = -1}
                         authorId.let { authorId ->
                             viewModel.getProductsByAuthor(authorId, 10, 1, 100)
                         }
@@ -189,7 +201,7 @@ class AuthorFragment : Fragment() {
                     totalPosition = adapter.itemCount
                     if (lastPosition != currentPosition && ((lastPosition == totalPosition - 3 && totalPosition % 2 == 0) || (lastPosition == totalPosition - 2 && totalPosition % 2 != 0))) {
                         currentPage++
-                        authorId.let { authorId ->
+                        authorId.let {
                             viewModel.getProductsByAuthor(authorId, 10, currentPage, 100)
                         }
                         currentPosition = lastPosition
@@ -220,7 +232,8 @@ class AuthorFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 val product = adapter.getBook(position)
                 viewModel.addItemToCart(product.product_id)
-                Toast.makeText(context, "Add item to cart successful", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Add item to cart successful", Toast.LENGTH_SHORT)
+                    .show()
             }
         })
     }

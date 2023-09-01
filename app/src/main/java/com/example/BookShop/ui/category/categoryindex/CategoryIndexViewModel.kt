@@ -14,14 +14,14 @@ import kotlinx.coroutines.launch
 
 class CategoryIndexViewModel : ViewModel() {
     // TODO: Implement the ViewModel
-    private val _categoryList = MutableLiveData<List<Category>>()
-    val categoryList: LiveData<List<Category>> get() = _categoryList
+    private val _categoryAllList = MutableLiveData<List<Category>>()
+    val categoryAllList: LiveData<List<Category>> get() = _categoryAllList
     private var categotyRepository: CategoryRepository? = CategoryRepositoryImp(RemoteDataSource())
     fun getAllCategory() {
         viewModelScope.launch(Dispatchers.IO) {
-            val response = categotyRepository?.getCategory()
+            val response = categotyRepository?.getAllCategory()
             if (response?.isSuccessful == true) {
-                _categoryList.postValue(response.body()?.categories)
+                _categoryAllList.postValue(response.body()?.categories)
             } else {
                 Log.d("CategoryNULL", "NULL")
             }

@@ -44,8 +44,8 @@
 
             <TextView
                 android:id="@+id/text_new_community"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 android:text="New and Community"
                 android:textColor="@color/black"
                 android:textSize="20dp"
@@ -53,25 +53,42 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/image_slide"
-                android:layout_width="wrap_content"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardview"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/first_book"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_margin="1dp"
+                app:cardCornerRadius="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_new_community" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_new_community">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewpager_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:layout_constraintDimensionRatio="w, 1:2" />
+
+                <me.relex.circleindicator.CircleIndicator3
+                    android:id="@+id/circleindicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="175dp"
+                    app:ci_drawable="@drawable/bg_indicator" />
+            </androidx.cardview.widget.CardView>
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
+                android:id="@+id/text_category"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="15dp"
                 android:text="Category"
                 android:textColor="@color/black"
                 android:textSize="20dp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/image_slide" />
+                app:layout_constraintTop_toBottomOf="@id/cardview" />
 
             <ImageView
                 android:id="@+id/image_navCategory"
@@ -81,47 +98,46 @@
                 android:layout_marginEnd="8dp"
                 android:padding="10dp"
                 android:src="@drawable/ic_nav_category"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/image_slide" />
+                app:layout_constraintBottom_toBottomOf="@id/text_category"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/text_category" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview_category"
-                android:layout_width="0dp"
+                android:id="@+id/recyclerview_hot_category"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="60dp"
-                app:layout_constraintBottom_toTopOf="@id/text_newarrival"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/image_slide" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_category" />
 
             <TextView
                 android:id="@+id/text_newarrival"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="15dp"
                 android:text="New Arrivals"
                 android:textColor="@color/black"
                 android:textSize="20dp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerview_category" />
+                app:layout_constraintTop_toBottomOf="@+id/recyclerview_hot_category" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_newarrival"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/text_discoverstore"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/text_newarrival" />
 
             <TextView
                 android:id="@+id/text_discoverstore"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:text="Discover Authors"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="15dp"
+                android:text="Famous Authors"
                 android:textColor="@color/black"
                 android:textSize="20dp"
                 android:textStyle="bold"
@@ -129,34 +145,32 @@
                 app:layout_constraintTop_toBottomOf="@+id/recyclerview_newarrival" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerview_discoverstore"
-                android:layout_width="0dp"
+                android:id="@+id/recyclerview_famous_author"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/text_hotbook"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_discoverstore" />
 
             <TextView
                 android:id="@+id/text_hotbook"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginTop="25dp"
                 android:text="Hot book"
                 android:textColor="@color/black"
                 android:textSize="20dp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerview_discoverstore" />
+                app:layout_constraintTop_toBottomOf="@+id/recyclerview_famous_author" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_hotbook"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text_hotbook"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_hotbook" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

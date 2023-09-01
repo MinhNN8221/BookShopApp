@@ -35,6 +35,7 @@ class CartFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        Log.d("LIFECYCLE", "onCreateView")
         binding = FragmentCartBinding.inflate(layoutInflater)
         return binding?.root
     }
@@ -42,10 +43,12 @@ class CartFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[CartViewModel::class.java]
+        Log.d("LIFECYCLE", "onCreate")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("LIFECYCLE", "onViewCreated")
         adapter = CartAdapter()
         initViewModel()
         viewModel.getAllCartItem()
@@ -65,7 +68,7 @@ class CartFragment : Fragment() {
                 viewModel.deleteAllItemCart()
                 Handler().postDelayed({
                     onResume()
-                },500)
+                }, 500)
             }
             recyclerCartItem.layoutManager = LinearLayoutManager(context)
             recyclerCartItem.adapter = adapter
@@ -93,7 +96,7 @@ class CartFragment : Fragment() {
                     textCartInfor.visibility = View.INVISIBLE
                     textCheckOut.setOnClickListener {
                         parentFragmentManager.beginTransaction()
-                            .replace(R.id.container, CheckOutFragment())
+                            .replace(R.id.container, CheckOutFragment(), "CartFragment")
                             .addToBackStack("Cart").commit()
                     }
                 }
@@ -110,7 +113,7 @@ class CartFragment : Fragment() {
             override fun onItemClick(position: Int) {
                 val cartItem = adapter.getItemCart(position)
                 val itemId = cartItem.itemId
-                var quantity = cartItem.quantity - 1
+                val quantity = cartItem.quantity - 1
                 val subTotalPrice =
                     cartItem.subTotal.toDouble() - cartItem.discountedPrice.toDouble()
                 if (quantity > 0) {
@@ -139,14 +142,7 @@ class CartFragment : Fragment() {
                             dialog.cancel()
                         }
                         .show()
-//                    itemId?.let { viewModel.removeItemInCart(it) }
-//                    adapter.setSubTotalPrice(subTotalPrice, position)
-//                    adapter.setProductQuantity(quantity, position)
-//                    adapter.removeData(position)
                 }
-
-//                binding?.textPrice?.text =
-//                    formatMoney.formatMoney((adapter.getTotalPrice()).toLong())
             }
         })
     }
@@ -178,6 +174,11 @@ class CartFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        Toast.makeText(requireContext(), "ONRESUME", Toast.LENGTH_SHORT).show()
+        viewModel.getAllCartItem()
+    }
+
+    fun refreshCartData() {
         viewModel.getAllCartItem()
     }
 }

@@ -18,6 +18,7 @@
             android:id="@+id/cardview"
             android:layout_width="110dp"
             android:layout_height="110dp"
+            android:layout_margin="1dp"
             android:layout_marginEnd="16dp"
             app:cardCornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -30,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/image_onboard" />
+                android:src="@drawable/placeholder_default_loading" />
 
         </androidx.cardview.widget.CardView>
 

@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
 
 class CategoryBookViewModel : ViewModel() {
     // TODO: Implement the ViewModel
-    private var _productList = MutableLiveData<List<Product>>()
-    val producList: LiveData<List<Product>> get() = _productList
+    private var _productState = MutableLiveData<ProductState>()
+    val producList: LiveData<ProductState> get() = _productState
     private var productRepository: ProductRepository? = ProductRepositoryImp(RemoteDataSource())
     private var cartRepository: CartRepository? = CartRepositoryImp(RemoteDataSource())
     private var searchRepository: SearchRepository? = SearchRepositoryImp(RemoteDataSource())
@@ -30,7 +30,7 @@ class CategoryBookViewModel : ViewModel() {
             val response =
                 productRepository?.getProductsByCategory(categoryId, limit, page, desLength)
             if (response?.isSuccessful == true) {
-                _productList.postValue(response.body()?.products)
+                _productState.postValue(ProductState(response.body()?.products, true))
             } else {
                 Log.d("CategroBookNULL", "NULL")
             }
@@ -57,7 +57,7 @@ class CategoryBookViewModel : ViewModel() {
                 categoryId,
             )
             if (response?.isSuccessful == true) {
-                _productList.postValue(response.body()?.products)
+                _productState.postValue(ProductState(response.body()?.products, false))
             } else {
                 Log.d("SearchCategory", "NULL")
             }

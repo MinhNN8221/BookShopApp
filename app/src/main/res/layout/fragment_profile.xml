@@ -202,7 +202,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <LinearLayout
-                android:id="@+id/text_change"
+                android:id="@+id/text_change_password"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginLeft="16dp"
