@@ -43,12 +43,10 @@ class CartFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[CartViewModel::class.java]
-        Log.d("LIFECYCLE", "onCreate")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d("LIFECYCLE", "onViewCreated")
         adapter = CartAdapter()
         initViewModel()
         viewModel.getAllCartItem()
@@ -174,7 +172,11 @@ class CartFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Toast.makeText(requireContext(), "ONRESUME", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            requireContext(),
+            "The API returns the missing product image url!",
+            Toast.LENGTH_SHORT
+        ).show()
         viewModel.getAllCartItem()
     }
 

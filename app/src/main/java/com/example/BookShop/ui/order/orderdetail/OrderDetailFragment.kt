@@ -47,7 +47,7 @@ class OrderDetailFragment : Fragment() {
         val orderId = arguments?.getString("orderId")?.toInt()
         val orderStatus = arguments?.getString("orderStatus")
         orderId?.let { orderId ->
-            viewModel.orderDetailList.observe(viewLifecycleOwner, Observer {orderDetail->
+            viewModel.orderDetailList.observe(viewLifecycleOwner, Observer { orderDetail ->
                 adapter.setData(orderDetail.products)
                 bindData(orderDetail, orderStatus.toString())
             })
@@ -79,6 +79,7 @@ class OrderDetailFragment : Fragment() {
                     orderTotal.toDouble().toLong()
                 )
             }
+            textShippingType.text = textShippingType.text.toString() + " " + it.shippingType
             loadingLayout.root.visibility = View.INVISIBLE
         }
     }

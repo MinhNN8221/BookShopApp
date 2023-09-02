@@ -70,7 +70,13 @@ class WishlistFragment : Fragment() {
                     .commit()
             }
             textAddToBag.setOnClickListener {
-                viewModel.addAllItemToCart()
+//                viewModel.addAllItemToCart()
+                Toast.makeText(
+                    requireContext(),
+                    "Missing API to add wishlist products to cart!",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
             }
             recyclerWishList.layoutManager = LinearLayoutManager(context)
             recyclerWishList.adapter = adapter

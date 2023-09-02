@@ -60,7 +60,6 @@ class PublisherViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val response = cartRepository?.addCartItem(productId)
             if (response?.isSuccessful == true) {
-                Log.d("SUCCESSFUL", "OK")
             } else {
                 Log.d("NULL", "NULL")
             }

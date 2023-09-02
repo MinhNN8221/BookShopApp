@@ -2,6 +2,7 @@ package com.example.BookShop.ui.auth.forgot
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -34,7 +35,8 @@ class ForgotPasswordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[ForgotPasswordViewModel::class.java]
-        inintViewModel()
+        loadingProgressBar=LoadingProgressBar(requireContext())
+        initViewModel()
         binding?.apply {
             imageLeft.setOnClickListener {
                 parentFragmentManager.popBackStack()
@@ -42,6 +44,7 @@ class ForgotPasswordFragment : Fragment() {
             buttonSendCode.setOnClickListener {
                 val email = editMail.text.toString()
                 val auth = AuthResponse(customer = Customer(email = email))
+                Log.d("Auth", auth.toString())
                 viewModel.checkFields(auth)
                 loadingProgressBar.show()
             }
@@ -53,7 +56,7 @@ class ForgotPasswordFragment : Fragment() {
         }
     }
 
-    private fun inintViewModel() {
+    private fun initViewModel() {
         viewModel.message.observe(viewLifecycleOwner) { message ->
             loadingProgressBar.cancel()
             message?.let { message ->

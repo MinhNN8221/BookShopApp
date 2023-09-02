@@ -73,6 +73,7 @@
         android:text="Chi tiết"
         android:textColor="@color/black"
         android:textSize="18dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/text_order_date"
         app:layout_constraintEnd_toEndOf="@+id/text_id_order"
         app:layout_constraintStart_toStartOf="@+id/recycler_order_detail" />
@@ -108,9 +109,20 @@
         android:text="@string/orderQuantity"
         android:textColor="@color/primary"
         android:textSize="14dp"
-        app:layout_constraintBottom_toTopOf="@id/text_status"
+        app:layout_constraintBottom_toTopOf="@id/text_shipping_type"
         app:layout_constraintEnd_toEndOf="@+id/text_order_date"
         app:layout_constraintStart_toStartOf="@+id/text_order_address" />
+
+    <TextView
+        android:id="@+id/text_shipping_type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Phương thức vận chuyển: "
+        android:textColor="@color/primary"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toTopOf="@id/text_status"
+        app:layout_constraintEnd_toEndOf="@+id/text_order_date"
+        app:layout_constraintStart_toStartOf="@+id/text_order_sum" />
 
     <TextView
         android:id="@+id/text_status"

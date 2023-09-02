@@ -19,6 +19,7 @@ import com.example.BookShop.data.model.AuthResponse
 import com.example.BookShop.data.model.Customer
 import com.example.BookShop.databinding.FragmentChangePassBinding
 import com.example.BookShop.utils.AlertMessageViewer
+import com.example.BookShop.utils.LoadingProgressBar
 
 class ChangePassFragment : Fragment() {
 
@@ -31,6 +32,7 @@ class ChangePassFragment : Fragment() {
     private var checkVisible = false
     private var checkVisibleNewPass = false
     private var checkVisibleConfirmPass = false
+    private lateinit var loadingProgressBar: LoadingProgressBar
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -50,6 +52,7 @@ class ChangePassFragment : Fragment() {
         binding?.imageLeft?.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
+        loadingProgressBar=LoadingProgressBar(requireContext())
         initViewModel()
         binding?.apply {
             layoutChangePassword.setOnTouchListener { view, motionEvent ->
@@ -74,6 +77,7 @@ class ChangePassFragment : Fragment() {
                     )
                 )
                 viewModel.checkFields(user)
+                loadingProgressBar.show()
             }
             imageEyeCurrentPass.setOnClickListener {
                 val cursorPosition = editCurrentPass.selectionEnd
@@ -130,6 +134,7 @@ class ChangePassFragment : Fragment() {
     private fun initViewModel() {
         viewModel.message.observe(viewLifecycleOwner){ message ->
             AlertMessageViewer.showAlertDialogMessage(requireContext(), message)
+            loadingProgressBar.cancel()
         }
     }
 }
