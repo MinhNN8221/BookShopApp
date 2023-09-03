@@ -36,6 +36,12 @@ class WishListAdapter() : RecyclerView.Adapter<WishListAdapter.ViewHolder>() {
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun removeData(position: Int) {
+        wishLists.removeAt(position)
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
         return wishLists.size
     }

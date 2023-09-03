@@ -93,7 +93,7 @@ class BookListAdapter : RecyclerView.Adapter<BookListAdapter.ViewHolder>() {
                 .into(binding.imageProduct)
             binding.textNameBook.text = product.name
             binding.textDescription.text = product.description
-            if (product.discounted_price != null) {
+            if (product.discounted_price != null && product.discounted_price != product.price){
                 binding.textDiscountPrice.visibility = View.VISIBLE
                 binding.textDiscountPrice.text =
                     product.discounted_price?.toDouble()

@@ -113,7 +113,7 @@ class CartFragment : Fragment() {
                 val itemId = cartItem.itemId
                 val quantity = cartItem.quantity - 1
                 val subTotalPrice =
-                    cartItem.subTotal.toDouble() - cartItem.discountedPrice.toDouble()
+                    cartItem.subTotal.toDouble() - (cartItem.discountedPrice?.toDouble() ?: 0.0)
                 if (quantity > 0) {
                     itemId?.let { viewModel.changeProductQuantityInCart(it, quantity) }
                     adapter.setSubTotalPrice(subTotalPrice, position)
@@ -152,7 +152,7 @@ class CartFragment : Fragment() {
                 val itemId = cartItem.itemId
                 val quantity = cartItem.quantity + 1
                 val subTotalPrice =
-                    cartItem.subTotal.toDouble() + cartItem.discountedPrice.toDouble()
+                    cartItem.subTotal.toDouble() + (cartItem.discountedPrice?.toDouble() ?: 0.0)
                 adapter.setSubTotalPrice(subTotalPrice, position)
                 adapter.setProductQuantity(quantity, position)
                 itemId?.let { viewModel.changeProductQuantityInCart(it, quantity) }

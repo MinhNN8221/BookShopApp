@@ -72,9 +72,9 @@ class BookAdapter(private val isNewArrival: Boolean) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is BookViewHolder -> {
-                if(productHomeList.size>0){
+                if (productHomeList.size > 0) {
                     holder.bindBookHome(productHomeList[position])
-                }else{
+                } else {
                     holder.bind(productList[position])
                 }
             }
@@ -104,7 +104,7 @@ class BookAdapter(private val isNewArrival: Boolean) :
                 .load(product.thumbnail)
                 .centerCrop()
                 .into(binding.imageProduct)
-            if (product.discounted_price != null) {
+            if (product.discounted_price != null && product.discounted_price != product.price){
                 val layoutParams =
                     binding.textPrice.layoutParams as ViewGroup.MarginLayoutParams
                 val newMarginTopInDp = 0
@@ -137,12 +137,13 @@ class BookAdapter(private val isNewArrival: Boolean) :
                 }
             }
         }
+
         fun bindBookHome(product: BookInHome) {
             Glide.with(binding.root)
                 .load(product.thumbnail)
                 .centerCrop()
                 .into(binding.imageProduct)
-            if (product.discountedPrice != null) {
+            if (product.discountedPrice != null && product.discountedPrice != product.price){
                 val layoutParams =
                     binding.textPrice.layoutParams as ViewGroup.MarginLayoutParams
                 val newMarginTopInDp = 0
@@ -166,7 +167,7 @@ class BookAdapter(private val isNewArrival: Boolean) :
                     onItemClickListener?.onItemClick(position)
                 }
             }
-            binding.imageCart.visibility=View.INVISIBLE
+            binding.imageCart.visibility = View.INVISIBLE
             binding.textName.text = product.name
         }
     }
@@ -178,7 +179,7 @@ class BookAdapter(private val isNewArrival: Boolean) :
                 .load(product.thumbnail)
                 .centerCrop()
                 .into(binding.imageProduct)
-            if (product.discountedPrice != null) {
+            if (product.discountedPrice != null && product.discountedPrice != product.price) {
                 binding.textDiscountPrice.text =
                     product.discountedPrice?.toDouble()
                         ?.let { formatMoney.formatMoney(it.toLong()) }

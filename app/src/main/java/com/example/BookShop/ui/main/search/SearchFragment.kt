@@ -471,7 +471,6 @@ class SearchFragment : Fragment() {
 
     private fun clickRemoveHistory() {
         adapterHistory.clickRemoveItem(object : OnItemClickListener {
-            @SuppressLint("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjdXN0b21lcl9pZCI6MiwibmFtZSI6IlR14bqlbiBBbmhhaGFiYmEiLCJlbWFpbCI6ImFuaGR0MUB5b3BtYWlsLmNvbSIsImlhdCI6MTY5MTE0MDQ0NCwiZXhwIjoxNjkyNDM2NDQ0fQ.-WZqzjEzfWgsdwK6KZXy79rJJkYd6ao1z1lNAJK_qzU")
             override fun onItemClick(position: Int) {
                 val productName = adapterHistory.getProductNameLocal(position)
                 productName?.let { viewModel.removeItemHistorySearchLocal(it) }

@@ -5,6 +5,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.RelativeSizeSpan
 import android.text.style.StrikethroughSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -91,7 +92,9 @@ class CartAdapter() : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
                 .into(binding.imageProduct)
             binding.textName.text = cartItem.name
             binding.textQuantity.text = cartItem.quantity.toString()
-            if (cartItem.discountedPrice != null) {
+            Log.d("HEllodi", "${cartItem.discountedPrice} ${cartItem.price}")
+            Log.d("HelloDi", (cartItem.discountedPrice != cartItem.price).toString())
+            if (cartItem.discountedPrice != null && cartItem.discountedPrice != cartItem.price) {
                 val layoutParams =
                     binding.imageFavorite.layoutParams as ViewGroup.MarginLayoutParams
                 val newMarginBottomInDp = 13
