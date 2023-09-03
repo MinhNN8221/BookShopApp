@@ -12,8 +12,24 @@ object MySharedPreferences {
             context.getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE)
     }
 
+    fun putString(key: String, value: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString(key, value)
+        editor.apply()
+    }
+
     fun getString(key: String, defaultValue: String): String {
         return sharedPreferences.getString(key, defaultValue) ?: defaultValue
+    }
+
+    fun putLogInTime(key: String, value: Long) {
+        val editor = sharedPreferences.edit()
+        editor.putLong(key, value)
+        editor.apply()
+    }
+
+    fun getLogInTime(key: String, defaultValue: Long): Long {
+        return sharedPreferences.getLong(key, defaultValue)
     }
 
     fun putAccessToken(value: String) {
@@ -24,12 +40,6 @@ object MySharedPreferences {
 
     fun getAccessToken(defaultValue: String?): String? {
         return sharedPreferences.getString(ACCESS_TOKEN, defaultValue) ?: defaultValue
-    }
-
-    fun putString(key: String, value: String) {
-        val editor = sharedPreferences.edit()
-        editor.putString(key, value)
-        editor.apply()
     }
 
     fun getBoolean(key: String, defaultValue: Boolean): Boolean {

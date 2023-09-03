@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -23,6 +24,7 @@ import com.example.BookShop.databinding.FragmentSignInBinding
 import com.example.BookShop.ui.auth.forgot.ForgotPasswordFragment
 import com.example.BookShop.ui.auth.signup.SignUpFragment
 import com.example.BookShop.ui.main.MainMenuFragment
+import com.example.BookShop.ui.profile.profilesignin.ProfileSignInFragment
 import com.example.BookShop.utils.AlertMessageViewer
 import com.example.BookShop.utils.LoadingProgressBar
 import com.example.BookShop.utils.MySharedPreferences
@@ -56,9 +58,24 @@ class SignInFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
         val accessToken = MySharedPreferences.getAccessToken(null)
+        val expiresIn = MySharedPreferences.getLogInTime("ExpiresIn", 0)
+        val loginTimeFirst = MySharedPreferences.getLogInTime("FirstTime", 0)
         if (accessToken != null) {
+            val loginTime = System.currentTimeMillis()
             navToMainScreen()
             RetrofitClient.updateAccessToken(accessToken)
+//            Log.d("LoginTimeFIRST", loginTimeFirst.toString())
+//            Log.d("LoginTIME", loginTime.toString())
+//            Log.d("LoginTime", (loginTime - loginTimeFirst).toString())
+            if ((loginTime - loginTimeFirst) > expiresIn) {
+                MySharedPreferences.clearPreferences()
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.container, ProfileSignInFragment()).commit()
+                AlertMessageViewer.showAlertDialogMessage(
+                    requireContext(),
+                    resources.getString(R.string.messageExpiresIn)
+                )
+            }
         }
         loadingProgressBar = LoadingProgressBar(requireContext())
         binding?.apply {
@@ -134,6 +151,9 @@ class SignInFragment : Fragment() {
             } else {
                 navToMainScreen()
                 MySharedPreferences.putAccessToken(it.loginResponse.accessToken)
+                val expiresIn = it.loginResponse.expiresIn.split(" ")[0].toLong()
+                MySharedPreferences.putLogInTime("ExpiresIn", expiresIn * 24 * 3600000)
+                MySharedPreferences.putLogInTime("FirstTime", System.currentTimeMillis())
                 RetrofitClient.updateAccessToken(it.loginResponse.accessToken)
                 it.loginResponse.customer.customerId?.let { idCustomer ->
                     MySharedPreferences.putInt(

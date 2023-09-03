@@ -27,7 +27,8 @@ class PublisherViewModel : ViewModel() {
     var job: Job? = null
 
     fun getProductsBySupplier(categoryId: Int, limit: Int, page: Int, desLength: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        job?.cancel()
+        job=viewModelScope.launch(Dispatchers.IO) {
             val response =
                 productRepository?.getProductsBySupplier(categoryId, limit, page, desLength)
             if (response?.isSuccessful == true) {
@@ -39,7 +40,8 @@ class PublisherViewModel : ViewModel() {
     }
 
     fun getSearchSupplierProduct(supplierId: Int, currentPage: Int, queryString: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        job?.cancel()
+        job=viewModelScope.launch(Dispatchers.IO) {
             val response =
                 searchRepository?.getSearchSupplierProducts(
                     supplierId,

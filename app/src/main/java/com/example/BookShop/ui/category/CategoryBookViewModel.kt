@@ -16,6 +16,7 @@ import com.example.BookShop.data.repository.search.SearchRepository
 import com.example.BookShop.data.repository.search.SearchRepositoryImp
 import com.example.BookShop.datasource.remote.RemoteDataSource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class CategoryBookViewModel : ViewModel() {
@@ -25,8 +26,10 @@ class CategoryBookViewModel : ViewModel() {
     private var productRepository: ProductRepository? = ProductRepositoryImp(RemoteDataSource())
     private var cartRepository: CartRepository? = CartRepositoryImp(RemoteDataSource())
     private var searchRepository: SearchRepository? = SearchRepositoryImp(RemoteDataSource())
+    var job: Job? = null
     fun getProductsInCategory(categoryId: Int, limit: Int, page: Int, desLength: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        job?.cancel()
+        job = viewModelScope.launch(Dispatchers.IO) {
             val response =
                 productRepository?.getProductsByCategory(categoryId, limit, page, desLength)
             if (response?.isSuccessful == true) {
@@ -48,7 +51,8 @@ class CategoryBookViewModel : ViewModel() {
     }
 
     fun getSearchCategoryProducts(categoryId: Int, currentPage: Int, queryString: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        job?.cancel()
+        job = viewModelScope.launch(Dispatchers.IO) {
             val response = searchRepository?.getSearchCategoryProducts(
                 10,
                 currentPage,
