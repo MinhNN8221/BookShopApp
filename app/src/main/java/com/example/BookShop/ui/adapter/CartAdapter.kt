@@ -92,8 +92,6 @@ class CartAdapter() : RecyclerView.Adapter<CartAdapter.ViewHolder>() {
                 .into(binding.imageProduct)
             binding.textName.text = cartItem.name
             binding.textQuantity.text = cartItem.quantity.toString()
-            Log.d("HEllodi", "${cartItem.discountedPrice} ${cartItem.price}")
-            Log.d("HelloDi", (cartItem.discountedPrice != cartItem.price).toString())
             if (cartItem.discountedPrice != null && cartItem.discountedPrice != cartItem.price) {
                 val layoutParams =
                     binding.imageFavorite.layoutParams as ViewGroup.MarginLayoutParams

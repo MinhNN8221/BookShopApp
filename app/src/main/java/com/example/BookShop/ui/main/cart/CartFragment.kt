@@ -172,11 +172,6 @@ class CartFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Toast.makeText(
-            requireContext(),
-            "The API returns the missing product image url!",
-            Toast.LENGTH_SHORT
-        ).show()
         viewModel.getAllCartItem()
     }
 
