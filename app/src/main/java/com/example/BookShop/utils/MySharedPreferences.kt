@@ -7,6 +7,7 @@ object MySharedPreferences {
     private const val sharedPreferencesName = "myPreference"
     private lateinit var sharedPreferences: SharedPreferences
     const val ACCESS_TOKEN = "access_token"
+    const val KEY_PERMISSION_DENIED_COUNT = "KEY_PERMISSION_DENIED_COUNT"
     fun init(context: Context) {
         sharedPreferences =
             context.getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE)
@@ -87,6 +88,22 @@ object MySharedPreferences {
                 editor.remove(key)
             }
         }
+        editor.apply()
+    }
+
+    fun putPermissionDeniedCount(count: Int) {
+        val editor = sharedPreferences.edit()
+        editor.putInt(KEY_PERMISSION_DENIED_COUNT, count)
+        editor.apply()
+    }
+
+    fun getPermissionDeniedCount(): Int {
+        return sharedPreferences.getInt(KEY_PERMISSION_DENIED_COUNT, 0)
+    }
+
+    fun removePermissionDeniedCount() {
+        val editor = sharedPreferences.edit()
+        editor.remove(KEY_PERMISSION_DENIED_COUNT)
         editor.apply()
     }
 }

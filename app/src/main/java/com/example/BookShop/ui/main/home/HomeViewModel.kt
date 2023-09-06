@@ -80,7 +80,6 @@ class HomeViewModel : ViewModel() {
             val response = productRepository.getHotBook()
             if (response?.isSuccessful == true) {
                 _bookHotList.postValue(response.body()?.products)
-                Log.d("RESPONSE", response.body().toString())
             } else {
                 Log.d("getHotBook", "NULL")
             }

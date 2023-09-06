@@ -35,7 +35,6 @@ class CartFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        Log.d("LIFECYCLE", "onCreateView")
         binding = FragmentCartBinding.inflate(layoutInflater)
         return binding?.root
     }

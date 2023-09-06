@@ -44,7 +44,6 @@ class ForgotPasswordFragment : Fragment() {
             buttonSendCode.setOnClickListener {
                 val email = editMail.text.toString()
                 val auth = AuthResponse(customer = Customer(email = email))
-                Log.d("Auth", auth.toString())
                 viewModel.checkFields(auth)
                 loadingProgressBar.show()
             }

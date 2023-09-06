@@ -63,7 +63,7 @@ class PublisherViewModel : ViewModel() {
             val response = cartRepository?.addCartItem(productId)
             if (response?.isSuccessful == true) {
             } else {
-                Log.d("NULL", "NULL")
+                Log.d("AddToCart", "NULL")
             }
         }
     }

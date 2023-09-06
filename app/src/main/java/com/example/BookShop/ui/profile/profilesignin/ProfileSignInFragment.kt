@@ -29,14 +29,6 @@ class ProfileSignInFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var backStackEntryCount = parentFragmentManager.backStackEntryCount
-
-        for (i in 0 until backStackEntryCount) {
-            val entry = parentFragmentManager.getBackStackEntryAt(i)
-            val fragmentTag = entry.name // Lấy tag của Fragment
-            Log.d("BackStack", "Fragment at index $i: $fragmentTag")
-        }
-
         binding?.apply {
             textBtnSignin.setOnClickListener {
                 parentFragmentManager.beginTransaction()

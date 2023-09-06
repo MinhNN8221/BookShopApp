@@ -3,6 +3,7 @@ package com.example.BookShop.ui.profile.updateprofile
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -11,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -59,7 +61,7 @@ class UpdateProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(UpdateProfileViewModel::class.java)
+        viewModel = ViewModelProvider(this)[UpdateProfileViewModel::class.java]
     }
 
     @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
@@ -73,11 +75,22 @@ class UpdateProfileFragment : Fragment() {
         activity?.let { MySharedPreferences.init(it.applicationContext) }
         binding?.apply {
             cardview.setOnClickListener {
-                if (context?.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(arrayOf(Manifest.permission.READ_MEDIA_IMAGES), 1)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (context?.checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(arrayOf(Manifest.permission.READ_MEDIA_IMAGES), 1)
+                    } else {
+                        MySharedPreferences.removePermissionDeniedCount()
+                        openImageDirectory()
+                    }
                 } else {
-                    openImageDirectory()
-//                    binding?.layoutLoading?.root?.visibility = View.VISIBLE
+                    if (context?.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(
+                            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                            1
+                        )
+                    } else {
+                        openImageDirectory()
+                    }
                 }
 
             }
@@ -136,19 +149,45 @@ class UpdateProfileFragment : Fragment() {
         })
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String?>,
         grantResults: IntArray,
     ) {
         if (requestCode == 1) {
-            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openImageDirectory()
+                MySharedPreferences.removePermissionDeniedCount()
             } else {
-                Toast.makeText(context, "User ko cap quyen", Toast.LENGTH_SHORT).show()
+                val permissionDeniedCount = MySharedPreferences.getPermissionDeniedCount()
+                if (permissionDeniedCount > 3) {
+                    showDialogToExplainWhyPermissionIsNeeded()
+                } else {
+                    incrementPermissionDeniedCount()
+                    Toast.makeText(context, "User ko cap quyen", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun showDialogToExplainWhyPermissionIsNeeded() {
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Cần truy cập hình ảnh")
+            .setMessage("Ứng dụng cần truy cập hình ảnh để hiển thị ảnh của bạn.")
+            .setPositiveButton("Đồng ý") { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", context?.packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+            .setNegativeButton("Hủy") { _, _ ->
+
+            }
+            .create()
+
+        dialog.show()
     }
 
     private fun openImageDirectory() {
@@ -158,6 +197,12 @@ class UpdateProfileFragment : Fragment() {
         startActivityForResult(intent, 1)
     }
 
+    private fun incrementPermissionDeniedCount() {
+        val count = MySharedPreferences.getPermissionDeniedCount() + 1
+        MySharedPreferences.putPermissionDeniedCount(count)
+    }
+
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {

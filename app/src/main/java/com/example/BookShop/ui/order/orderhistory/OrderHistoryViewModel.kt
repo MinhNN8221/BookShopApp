@@ -20,7 +20,7 @@ class OrderHistoryViewModel : ViewModel() {
             if (response?.isSuccessful == true) {
                 _orderHistory.postValue(response.body()?.orders)
             } else {
-                Log.d("NULLL", "NULLL")
+                Log.d("GetOrderHistory", "NULLL")
             }
         }
     }
