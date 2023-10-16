@@ -1,10 +1,13 @@
 package com.example.BookShop
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.BookShop.databinding.ActivityMainBinding
 import com.example.BookShop.ui.auth.signin.SignInFragment
+import com.example.BookShop.ui.checkout.CheckOutFragment
 import com.example.BookShop.ui.onboarding.OnboardingFragment
 import com.example.BookShop.utils.MySharedPreferences
 
@@ -34,5 +37,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun setFirstLaunch(isFirstTime: Boolean) {
         MySharedPreferences.putBoolean("firstLaunch", isFirstTime)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        val fragment: CheckOutFragment? =
+            supportFragmentManager.findFragmentById(R.id.container) as CheckOutFragment?
+        fragment?.let {
+            intent?.let { it1 -> fragment.handleNewIntent(it1) }
+        }
     }
 }

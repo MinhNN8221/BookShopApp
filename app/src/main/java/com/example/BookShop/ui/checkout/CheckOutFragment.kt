@@ -1,15 +1,21 @@
 package com.example.BookShop.ui.checkout
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.StrictMode
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.BookShop.R
+import com.example.BookShop.data.api.apizalopay.CreateOrder
 import com.example.BookShop.databinding.FragmentCheckOutBinding
 import com.example.BookShop.databinding.FragmentMainMenuBinding
 import com.example.BookShop.ui.adapter.BookListAdapter
@@ -23,8 +29,13 @@ import com.example.BookShop.ui.main.wishlist.WishlistFragment
 import com.example.BookShop.ui.order.orderinfor.OrderInforFragment
 import com.example.BookShop.ui.profile.ProfileViewModel
 import com.example.BookShop.ui.profile.ProfileViewModelFactory
+import com.example.BookShop.utils.AlertMessageViewer
 import com.example.BookShop.utils.FormatMoney
 import com.example.BookShop.utils.LoadingProgressBar
+import vn.zalopay.sdk.Environment
+import vn.zalopay.sdk.ZaloPayError
+import vn.zalopay.sdk.ZaloPaySDK
+import vn.zalopay.sdk.listeners.PayOrderListener
 
 class CheckOutFragment : Fragment() {
 
@@ -48,6 +59,10 @@ class CheckOutFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+        // ZaloPay SDK Init
+        ZaloPaySDK.init(2553, Environment.SANDBOX)
         binding = FragmentCheckOutBinding.inflate(layoutInflater, container, false)
         return binding?.root
     }
@@ -68,7 +83,29 @@ class CheckOutFragment : Fragment() {
         viewModelCart.getAllCartItem()
         viewModelProfile.getCustomer()
 
+        val items =
+            arrayOf("Thanh toán bằng MoMo", "Thanh toán bằng ZaloPay", "Thanh toán bằng tiền mặt")
+
+        // Kết nối ArrayAdapter với Spinner
+        val adapterSpinner = ArrayAdapter(requireContext(), R.layout.item_spinner, items)
+        var idPayment = 0L
         binding?.apply {
+            spinnerPayment.adapter = adapterSpinner
+            spinnerPayment.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long,
+                ) {
+                    idPayment = id
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    TODO("Not yet implemented")
+                }
+
+            }
             textChangeInfor.setOnClickListener {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.container, OrderInforFragment())
@@ -76,18 +113,22 @@ class CheckOutFragment : Fragment() {
                     .commit()
             }
             textPayment.setOnClickListener {
-                val address = textCutomerAddress.text.toString()
-                val receiverName = textCustomerName.text.toString()
-                val receiverPhone = textCutomerPhone.text.toString()
-                viewModelCheckOut.createOrder(
-                    cartId,
-                    shippingId,
-                    address,
-                    receiverName,
-                    receiverPhone
-                )
+//                val address = textCutomerAddress.text.toString()
+//                val receiverName = textCustomerName.text.toString()
+//                val receiverPhone = textCutomerPhone.text.toString()
+//                viewModelCheckOut.createOrder(
+//                    cartId,
+//                    shippingId,
+//                    address,
+//                    receiverName,
+//                    receiverPhone
+//                )
+                when (idPayment) {
+                    1L -> paymentZalopay()
+                    2L -> paymentCash()
+                }
                 check = true
-                loadingProgressBar.show()
+//                loadingProgressBar.show()
             }
             imageLeft.setOnClickListener {
                 parentFragmentManager.popBackStack()
@@ -95,6 +136,86 @@ class CheckOutFragment : Fragment() {
             }
             recyclerCartItem.layoutManager = LinearLayoutManager(context)
             recyclerCartItem.adapter = adapter
+        }
+    }
+
+    private fun paymentZalopay() {
+        var token = ""
+        val orderApi = CreateOrder()
+        try {
+            val amount = binding?.textTotalPrice?.text?.replace(Regex("\\D"), "")
+            val data = orderApi.createOrder(amount.toString())
+            val code = data?.getString("return_code")
+            Toast.makeText(requireContext(), "return_code: $code", Toast.LENGTH_LONG).show()
+            if (code == "1") {
+                token = data.getString("zp_trans_token")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        //Gọi hàm thanh toán
+        ZaloPaySDK.getInstance()
+            .payOrder(requireActivity(), token, "zalopay_payment://app", object : PayOrderListener {
+                override fun onPaymentSucceeded(
+                    transactionId: String,
+                    transToken: String,
+                    appTransID: String,
+                ) {
+                    createOrder()
+                    activity?.runOnUiThread {
+                        AlertMessageViewer.showAlertZalopay(
+                            requireContext(),
+                            "Thanh toán thành công!",
+                            "TransactionId: $transactionId - TransToken: $transToken"
+                        )
+                    }
+                }
+
+                override fun onPaymentCanceled(zpTransToken: String, appTransID: String) {
+                    AlertMessageViewer.showAlertZalopay(
+                        requireContext(),
+                        "Khách hàng hủy thanh toán bằng ZaloPay",
+                        "zpTransToken: $zpTransToken"
+                    )
+                }
+
+                override fun onPaymentError(
+                    zaloPayError: ZaloPayError,
+                    zpTransToken: String,
+                    appTransID: String,
+                ) {
+                    AlertMessageViewer.showAlertZalopay(
+                        requireContext(),
+                        "Thanh toán thất bại!",
+                        "ZaloPayErrorCode: ${zaloPayError.toString()}\nTransToken: $zpTransToken"
+                    )
+                }
+            })
+
+    }
+
+    //Cần bắt sự kiện OnNewIntent vì ZaloPay App sẽ gọi deeplink về app của Merchant
+    fun handleNewIntent(intent: Intent) {
+        ZaloPaySDK.getInstance().onResult(intent)
+    }
+
+    private fun paymentCash() {
+        createOrder()
+    }
+
+    private fun createOrder() {
+        binding?.apply {
+            val address = textCutomerAddress.text.toString()
+            val receiverName = textCustomerName.text.toString()
+            val receiverPhone = textCutomerPhone.text.toString()
+            viewModelCheckOut.createOrder(
+                cartId,
+                shippingId,
+                address,
+                receiverName,
+                receiverPhone
+            )
         }
     }
 
@@ -114,7 +235,7 @@ class CheckOutFragment : Fragment() {
                         }
                     }
                     .show()
-                check=false
+                check = false
             }
         }
         viewModelCart.cartItem.observe(viewLifecycleOwner) { cartItem ->

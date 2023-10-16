@@ -15,4 +15,15 @@ object AlertMessageViewer {
             }
             .show()
     }
+
+    fun showAlertZalopay(context: Context, title: String, message: String) {
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.cancel()
+            }
+            .show()
+    }
 }
