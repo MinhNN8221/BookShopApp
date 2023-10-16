@@ -22,7 +22,7 @@ class CreateOrder {
 
         init {
             val appTime = Date().time
-            AppId = AppZaloPayInfo.APP_ID.toString()
+            AppId = AppZaloPayInfo().APP_ID.toString()
             AppUser = "Android_Demo"
             AppTime = appTime.toString()
             Amount = amount
@@ -32,7 +32,7 @@ class CreateOrder {
             BankCode = "zalopayapp"
             Description = "Thanh toán đơn hàng cho BOOKSHOP"
             val inputHMac = "${this.AppId}|${this.AppTransId}|${this.AppUser}|${this.Amount}|${this.AppTime}|${this.EmbedData}|${this.Items}"
-            Mac = Helpers().getMac(AppZaloPayInfo.MAC_KEY, inputHMac).toString()
+            Mac = Helpers().getMac(AppZaloPayInfo().MAC_KEY, inputHMac).toString()
         }
     }
 
@@ -52,6 +52,6 @@ class CreateOrder {
             .add("mac", input.Mac)
             .build()
 
-        return HttpProvider().sendPost(AppZaloPayInfo.URL_CREATE_ORDER, formBody)
+        return HttpProvider().sendPost(AppZaloPayInfo().URL_CREATE_ORDER, formBody)
     }
 }
